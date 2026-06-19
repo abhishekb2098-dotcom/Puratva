@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 60 56% 98%;
+    --foreground: 148 36% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 148 36% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 148 36% 10%;
+    --primary: 148 41% 30%;
+    --primary-foreground: 60 56% 98%;
+    --secondary: 45 74% 46%;
+    --secondary-foreground: 148 36% 10%;
+    --muted: 60 20% 94%;
+    --muted-foreground: 148 10% 45%;
+    --accent: 45 74% 46%;
+    --accent-foreground: 148 36% 10%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 148 15% 88%;
+    --input: 148 15% 88%;
+    --ring: 148 41% 30%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 148 36% 5%;
+    --foreground: 60 56% 98%;
+    --card: 148 36% 8%;
+    --card-foreground: 60 56% 98%;
+    --popover: 148 36% 8%;
+    --popover-foreground: 60 56% 98%;
+    --primary: 148 41% 50%;
+    --primary-foreground: 148 36% 5%;
+    --secondary: 45 74% 46%;
+    --secondary-foreground: 148 36% 5%;
+    --muted: 148 36% 12%;
+    --muted-foreground: 148 15% 65%;
+    --accent: 45 74% 46%;
+    --accent-foreground: 148 36% 5%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 148 36% 15%;
+    --input: 148 36% 15%;
+    --ring: 148 41% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Swiper custom styles */
+.swiper-pagination-bullet {
+  @apply bg-puratva-green opacity-50;
+}
+.swiper-pagination-bullet-active {
+  @apply bg-puratva-green opacity-100;
+}
+.swiper-button-next,
+.swiper-button-prev {
+  @apply text-puratva-green;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-muted;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-puratva-green rounded-full;
+}
