@@ -37,8 +37,8 @@ export async function POST(req: NextRequest) {
 
     // Insert into Turso (photos table assumed)
     await client.execute({
-      sql: `INSERT INTO photos (id, url, filename, metadata, created_at) VALUES (?, ?, ?, ?, ?)`,
-      args: [id, finalUrl, fileName, metaStr, createdAt],
+      sql: `INSERT INTO photos (id, url, filename, metadata, created_at) VALUES (?, ?, ?, ?, ?)` ,
+      args: [id, finalUrl, fileName ?? "", metaStr, createdAt],
     });
 
     return NextResponse.json({ success: true, data: { id, url: finalUrl, filename: fileName, metadata } });
