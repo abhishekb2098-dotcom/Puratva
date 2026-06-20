@@ -1,29 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { uploadImage } from "@/lib/cloudinary";
-import { mkdir, writeFile } from "fs/promises";
-import path from "path";
-import { randomUUID } from "crypto";
 
 const hasCloudinaryConfig = Boolean(
   process.env.CLOUDINARY_CLOUD_NAME &&
     process.env.CLOUDINARY_API_KEY &&
     process.env.CLOUDINARY_API_SECRET
 );
-
-function getExtension(file: File) {
-  const fromName = path.extname(file.name || "").toLowerCase();
-  if (fromName) return fromName;
-
-  const mimeExtensions: Record<string, string> = {
-    "image/jpeg": ".jpg",
-    "image/png": ".png",
-    "image/webp": ".webp",
-    "image/gif": ".gif",
-  };
-
-  return mimeExtensions[file.type] || ".jpg";
-}
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -40,20 +23,14 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(bytes);
 
     if (!hasCloudinaryConfig) {
-      const folder = (formData.get("folder") as string) || "puratva/products";
-      const subfolder = folder.split("/").pop() || "products";
-      const uploadDir = path.join(process.cwd(), "public", "uploads", subfolder);
-      await mkdir(uploadDir, { recursive: true });
-
-      const filename = `${Date.now()}-${randomUUID()}${getExtension(file)}`;
-      await writeFile(path.join(uploadDir, filename), buffer);
-
-      return NextResponse.json({
-        success: true,
-        url: `/uploads/${subfolder}/${filename}`,
-        public_id: null,
-        storage: "local",
-      });
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "Cloudinary is not configured. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET.",
+        },
+        { status: 500 }
+      );
     }
 
     const base64 = `data:${file.type};base64,${buffer.toString("base64")}`;
@@ -61,7 +38,7 @@ export async function POST(req: NextRequest) {
     const folder = (formData.get("folder") as string) || "puratva/products";
     const { url, public_id } = await uploadImage(base64, folder);
 
-    return NextResponse.json({ success: true, url, public_id });
+    return NextResponse.json({ success: true, url, public_id, storage: "cloudinary" });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
