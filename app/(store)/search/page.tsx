@@ -1,8 +1,10 @@
-import { prisma } from "@/lib/prisma";
+﻿import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import Image from "next/image";
 import { Search } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
+
+export const dynamic = 'force-dynamic';
 
 type Props = { searchParams: Promise<{ q?: string }> };
 
@@ -33,7 +35,7 @@ export default async function SearchPage({ searchParams }: Props) {
         <input
           name="q"
           defaultValue={query}
-          placeholder="Search for ghee, oils, pickles…"
+          placeholder="Search for ghee, oils, picklesâ€¦"
           className="flex-1 border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-puratva-green"
         />
         <button type="submit" className="bg-puratva-green text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-puratva-green-dark transition-colors flex items-center gap-2">
@@ -57,7 +59,7 @@ export default async function SearchPage({ searchParams }: Props) {
                   {img ? (
                     <Image src={img} alt={p.name} fill className="object-cover" />
                   ) : (
-                    <div className="h-full flex items-center justify-center text-3xl">🌿</div>
+                    <div className="h-full flex items-center justify-center text-3xl">ðŸŒ¿</div>
                   )}
                 </div>
                 <div className="p-3">

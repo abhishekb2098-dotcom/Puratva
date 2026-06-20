@@ -1,8 +1,10 @@
-import { prisma } from "@/lib/prisma";
+﻿import { prisma } from "@/lib/prisma";
 import Image from "next/image";
 import { Star, MessageSquare } from "lucide-react";
 import TestimonialActions from "@/components/admin/TestimonialActions";
 import Link from "next/link";
+
+export const dynamic = 'force-dynamic';
 
 export default async function AdminTestimonialsPage({ searchParams }: { searchParams: any }) {
   const status = searchParams?.status || "PENDING";

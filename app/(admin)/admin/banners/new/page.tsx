@@ -1,6 +1,8 @@
-import BannerForm from "@/components/admin/BannerForm";
+﻿import BannerForm from "@/components/admin/BannerForm";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
+
+export const dynamic = 'force-dynamic';
 
 export default function NewBannerPage() {
   return (

@@ -1,6 +1,8 @@
-import { auth } from "@/lib/auth";
+﻿import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { User, Mail, Phone } from "lucide-react";
+
+export const dynamic = 'force-dynamic';
 
 export default async function ProfilePage() {
   const session = await auth();

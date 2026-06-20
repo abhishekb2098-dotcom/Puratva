@@ -1,7 +1,9 @@
-import { prisma } from "@/lib/prisma";
+﻿import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Plus, BookOpen, Edit, Trash2 } from "lucide-react";
 import BlogDeleteButton from "@/components/admin/BlogDeleteButton";
+
+export const dynamic = 'force-dynamic';
 
 export default async function AdminBlogsPage() {
   const blogs = await prisma.blog.findMany({ orderBy: { createdAt: "desc" } });
@@ -24,7 +26,7 @@ export default async function AdminBlogsPage() {
             <BookOpen className="w-12 h-12 mx-auto mb-3 opacity-40" />
             <p>No blog posts yet.</p>
             <Link href="/admin/blogs/new" className="mt-3 inline-block text-puratva-green hover:underline text-sm">
-              Write your first post →
+              Write your first post â†’
             </Link>
           </div>
         ) : (

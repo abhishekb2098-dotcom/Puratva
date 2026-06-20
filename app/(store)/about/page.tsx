@@ -1,5 +1,7 @@
-import { getSiteConfig } from "@/lib/site-config";
+﻿import { getSiteConfig } from "@/lib/site-config";
 import { Leaf, Heart, Shield, Users } from "lucide-react";
+
+export const dynamic = 'force-dynamic';
 
 export default async function AboutPage() {
   const config = await getSiteConfig();
@@ -38,7 +40,7 @@ export default async function AboutPage() {
                 { value: "50+", label: "Partner Farms" },
                 { value: "10K+", label: "Happy Customers" },
                 { value: "100%", label: "Organic Certified" },
-                { value: "5★", label: "Avg. Rating" },
+                { value: "5â˜…", label: "Avg. Rating" },
               ].map(({ value, label }) => (
                 <div key={label}>
                   <div className="text-3xl font-bold text-puratva-green">{value}</div>

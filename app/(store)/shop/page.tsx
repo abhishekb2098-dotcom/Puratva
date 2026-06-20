@@ -1,12 +1,14 @@
-import { prisma } from "@/lib/prisma";
+﻿import { prisma } from "@/lib/prisma";
 import { Metadata } from "next";
 import ProductGrid from "@/components/shop/ProductGrid";
 import ShopFilters from "@/components/shop/ShopFilters";
 import ShopHeader from "@/components/shop/ShopHeader";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: "Shop All Products",
-  description: "Browse our complete range of organic, farm-fresh products — oils, ghee, pickles, pulses, dairy and more.",
+  description: "Browse our complete range of organic, farm-fresh products â€” oils, ghee, pickles, pulses, dairy and more.",
 };
 
 async function getProducts(searchParams: any) {

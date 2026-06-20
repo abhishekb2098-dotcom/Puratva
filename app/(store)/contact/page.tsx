@@ -1,6 +1,8 @@
-import { getSiteConfig } from "@/lib/site-config";
+﻿import { getSiteConfig } from "@/lib/site-config";
 import ContactForm from "@/components/store/ContactForm";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
+
+export const dynamic = 'force-dynamic';
 
 export default async function ContactPage() {
   const config = await getSiteConfig();

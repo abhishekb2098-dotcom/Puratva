@@ -55,12 +55,14 @@ export default function Navbar({
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isShopOpen, setIsShopOpen] = useState(false);
   const [isUserOpen, setIsUserOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { data: session } = useSession();
   const totalItems = useCartStore((s) => s.totalItems());
   const wishlistItems = useWishlistStore((s) => s.items.length);
   const toggleCart = useCartStore((s) => s.toggleCart);
 
   useEffect(() => {
+    setMounted(true);
     const handler = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handler);
     return () => window.removeEventListener("scroll", handler);
@@ -206,7 +208,7 @@ export default function Navbar({
 
             <Link href="/wishlist" className="p-2 hover:text-puratva-green transition-colors relative hidden md:flex">
               <Heart className="w-5 h-5" />
-              {wishlistItems > 0 && (
+              {mounted && wishlistItems > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
                   {wishlistItems}
                 </span>
@@ -218,7 +220,7 @@ export default function Navbar({
               className="p-2 hover:text-puratva-green transition-colors relative"
             >
               <ShoppingCart className="w-5 h-5" />
-              {totalItems > 0 && (
+              {mounted && totalItems > 0 && (
                 <span className="absolute -top-1 -right-1 bg-puratva-green text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
                   {totalItems}
                 </span>

@@ -1,6 +1,8 @@
-import { prisma } from "@/lib/prisma";
+﻿import { prisma } from "@/lib/prisma";
 import { formatPrice } from "@/lib/utils";
 import { TrendingUp, ShoppingBag, Users, Package, Star } from "lucide-react";
+
+export const dynamic = 'force-dynamic';
 
 async function getData() {
   const now = new Date();
@@ -131,7 +133,7 @@ export default async function AnalyticsPage() {
                 <td className="py-3 font-medium">{m.label}</td>
                 <td className="py-3">{m.orders}</td>
                 <td className="py-3">{formatPrice(m.revenue)}</td>
-                <td className="py-3">{m.orders > 0 ? formatPrice(m.revenue / m.orders) : "—"}</td>
+                <td className="py-3">{m.orders > 0 ? formatPrice(m.revenue / m.orders) : "â€”"}</td>
               </tr>
             ))}
           </tbody>

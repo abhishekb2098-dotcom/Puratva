@@ -1,5 +1,7 @@
-import { prisma } from "@/lib/prisma";
+﻿import { prisma } from "@/lib/prisma";
 import CategoryEditor from "@/components/admin/CategoryEditor";
+
+export const dynamic = 'force-dynamic';
 
 export default async function AdminCategoriesPage() {
   const categories = await prisma.category.findMany({

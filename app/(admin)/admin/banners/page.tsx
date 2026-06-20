@@ -1,8 +1,10 @@
-import { prisma } from "@/lib/prisma";
+﻿import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import Image from "next/image";
 import { Plus, Edit, Trash2, Image as ImageIcon } from "lucide-react";
 import BannerActions from "@/components/admin/BannerActions";
+
+export const dynamic = 'force-dynamic';
 
 export default async function AdminBannersPage() {
   const banners = await prisma.banner.findMany({ orderBy: { sortOrder: "asc" } });
@@ -59,7 +61,7 @@ export default async function AdminBannersPage() {
         <div className="text-center py-16 text-muted-foreground bg-white rounded-2xl border">
           <ImageIcon className="w-12 h-12 mx-auto mb-3 opacity-40" />
           <p>No banners yet. Add your first banner!</p>
-          <Link href="/admin/banners/new" className="mt-3 inline-block text-puratva-green hover:underline text-sm">Create Banner →</Link>
+          <Link href="/admin/banners/new" className="mt-3 inline-block text-puratva-green hover:underline text-sm">Create Banner â†’</Link>
         </div>
       )}
     </div>

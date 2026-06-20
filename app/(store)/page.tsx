@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+﻿import { prisma } from "@/lib/prisma";
 import { getSiteConfig } from "@/lib/site-config";
 import HeroSection from "@/components/home/HeroSection";
 import CategoriesSection from "@/components/home/CategoriesSection";
@@ -6,6 +6,8 @@ import FeaturedProducts from "@/components/home/FeaturedProducts";
 import WhyPuratva from "@/components/home/WhyPuratva";
 import TestimonialsSection from "@/components/home/TestimonialsSection";
 import NewsletterSection from "@/components/home/NewsletterSection";
+
+export const dynamic = 'force-dynamic';
 
 async function getData() {
   try {
@@ -104,7 +106,7 @@ export default async function HomePage() {
             key="bestSellers"
             products={bestSellers as any}
             title="Best Sellers"
-            subtitle="Our most loved products — trusted by thousands of happy customers."
+            subtitle="Our most loved products â€” trusted by thousands of happy customers."
             spacing={sp}
           />
         );

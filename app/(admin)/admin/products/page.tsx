@@ -1,9 +1,11 @@
-import { prisma } from "@/lib/prisma";
+﻿import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import Image from "next/image";
 import { formatPrice } from "@/lib/utils";
 import { Plus, Edit, Trash2, Package } from "lucide-react";
 import DeleteProductButton from "@/components/admin/DeleteProductButton";
+
+export const dynamic = 'force-dynamic';
 
 async function getProducts(searchParams: any) {
   const search = searchParams?.search;

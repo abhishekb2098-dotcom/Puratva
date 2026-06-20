@@ -1,5 +1,7 @@
-import { prisma } from "@/lib/prisma";
+﻿import { prisma } from "@/lib/prisma";
 import { Users } from "lucide-react";
+
+export const dynamic = 'force-dynamic';
 
 export default async function CustomersPage() {
   const customers = await prisma.user.findMany({
@@ -34,7 +36,7 @@ export default async function CustomersPage() {
             <tbody className="divide-y">
               {customers.map((u) => (
                 <tr key={u.id} className="hover:bg-muted/20">
-                  <td className="px-4 py-3 font-medium">{u.name || "—"}</td>
+                  <td className="px-4 py-3 font-medium">{u.name || "â€”"}</td>
                   <td className="px-4 py-3 text-muted-foreground">{u.email}</td>
                   <td className="px-4 py-3">
                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${u.role === "ADMIN" ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-600"}`}>

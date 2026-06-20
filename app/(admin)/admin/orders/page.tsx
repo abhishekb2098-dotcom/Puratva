@@ -1,8 +1,10 @@
-import { prisma } from "@/lib/prisma";
+﻿import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { formatPrice, formatDate } from "@/lib/utils";
 import { ShoppingBag } from "lucide-react";
 import OrderStatusUpdater from "@/components/admin/OrderStatusUpdater";
+
+export const dynamic = 'force-dynamic';
 
 const statusColors: Record<string, string> = {
   PENDING: "bg-yellow-100 text-yellow-700",

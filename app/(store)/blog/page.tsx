@@ -1,7 +1,9 @@
-import { prisma } from "@/lib/prisma";
+﻿import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import Image from "next/image";
 import { BookOpen } from "lucide-react";
+
+export const dynamic = 'force-dynamic';
 
 export default async function BlogPage() {
   const posts = await prisma.blog.findMany({
@@ -34,12 +36,12 @@ export default async function BlogPage() {
                 <div className="p-5">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
                     <span>{post.author}</span>
-                    <span>·</span>
+                    <span>Â·</span>
                     <span>{(post.publishedAt ?? post.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</span>
                   </div>
                   <h2 className="font-bold text-lg mb-2 group-hover:text-puratva-green transition-colors">{post.title}</h2>
                   {post.excerpt && <p className="text-sm text-muted-foreground line-clamp-3">{post.excerpt}</p>}
-                  <span className="mt-3 inline-block text-sm text-puratva-green font-medium">Read more →</span>
+                  <span className="mt-3 inline-block text-sm text-puratva-green font-medium">Read more â†’</span>
                 </div>
               </Link>
             ))}

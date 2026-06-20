@@ -1,7 +1,9 @@
-import { prisma } from "@/lib/prisma";
+﻿import { prisma } from "@/lib/prisma";
 import { formatPrice } from "@/lib/utils";
 import { ShoppingBag, Users, Package, TrendingUp, Clock, CheckCircle, XCircle, Truck } from "lucide-react";
 import Link from "next/link";
+
+export const dynamic = 'force-dynamic';
 
 async function getStats() {
   const now = new Date();
@@ -144,7 +146,7 @@ export default async function AdminDashboard() {
               <p className="text-2xl font-bold text-yellow-600">{pendingTestimonials}</p>
               <p className="text-sm text-muted-foreground mt-1">awaiting review</p>
               <Link href="/admin/testimonials?status=PENDING" className="text-sm text-puratva-green hover:underline mt-2 block">
-                Review now →
+                Review now â†’
               </Link>
             </div>
           )}
