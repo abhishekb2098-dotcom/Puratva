@@ -15,9 +15,9 @@ export default async function SearchPage({ searchParams }: Props) {
         where: {
           isActive: true,
           OR: [
-            { name: { contains: query, mode: "insensitive" } },
-            { description: { contains: query, mode: "insensitive" } },
-            { tags: { contains: query, mode: "insensitive" } },
+            { name: { contains: query } },
+            { description: { contains: query } },
+            { tags: { contains: query } },
           ],
         },
         include: { images: { orderBy: { sortOrder: "asc" }, take: 1 } },
