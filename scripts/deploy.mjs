@@ -206,9 +206,18 @@ const toSync = {
   PRISMA_DATABASE_URL: "file:./placeholder.db",
 };
 
+function shouldSkipEnv(key, value) {
+  if (!value) return true;
+  if (SKIP_KEYS.has(key)) return true;
+  if (key === "PRISMA_DATABASE_URL") return false;
+  return PLACEHOLDER_PATTERNS.test(value);
+}
+
 for (const [key, value] of Object.entries(toSync)) {
-  if (!value || SKIP_KEYS.has(key)) { warn(`Skipping ${key}`); continue; }
-  if (PLACEHOLDER_PATTERNS.test(value)) { warn(`Skipping ${key} (placeholder)`); continue; }
+  if (shouldSkipEnv(key, value)) {
+    warn(`Skipping ${key}${value && key !== "PRISMA_DATABASE_URL" ? " (placeholder)" : ""}`);
+    continue;
+  }
 
   const success = vercelEnvSet(key, value);
   if (success) ok(`Set ${key}`);

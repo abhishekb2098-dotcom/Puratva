@@ -36,11 +36,21 @@ export async function POST(req: NextRequest) {
     const metaStr = metadata ? JSON.stringify(metadata) : "{}";
 
     // Insert into Turso (photos table assumed)
+    // await client.execute({
+    //   sql: `INSERT INTO photos (id, url, filename, metadata, created_at) VALUES (?, ?, ?, ?, ?)` ,
+    //   args: [id, finalUrl, fileName ?? "", metaStr, createdAt],
+    // });
     await client.execute({
-      sql: `INSERT INTO photos (id, url, filename, metadata, created_at) VALUES (?, ?, ?, ?, ?)` ,
-      args: [id, finalUrl, fileName ?? "", metaStr, createdAt],
+    sql: `INSERT INTO photos (id, url, filename, metadata, created_at)
+            VALUES (?, ?, ?, ?, ?)`,
+    args: {
+        1: id,
+        2: finalUrl,
+        3: fileName ?? "",
+        4: metaStr,
+        5: createdAt,
+    },
     });
-
     return NextResponse.json({ success: true, data: { id, url: finalUrl, filename: fileName, metadata } });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

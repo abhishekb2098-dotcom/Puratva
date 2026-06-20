@@ -60,6 +60,17 @@ CREATE TABLE IF NOT EXISTS "categories" (
 );
 
 -- CreateTable
+CREATE TABLE IF NOT EXISTS "photos" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "filename" TEXT NOT NULL,
+    "url" TEXT,
+    "metadata" TEXT,
+    "sortOrder" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME
+);
+
+-- CreateTable
 CREATE TABLE IF NOT EXISTS "sub_categories" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "name" TEXT NOT NULL,

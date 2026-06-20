@@ -17,8 +17,10 @@ const playfair = Playfair_Display({
   display: "swap",
 });
 
+const appBaseUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://puratva.com"),
+  metadataBase: appBaseUrl ? new URL(appBaseUrl) : undefined,
   title: {
     default: "Puratva – Pure. Traditional. Authentic.",
     template: "%s | Puratva",
