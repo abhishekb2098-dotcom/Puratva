@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 
-type Params = {
-  params: Promise<{ id: string }>;
-};
+type Params = { params: Promise<{ id: string }> };
 
 export async function PUT(req: NextRequest, { params }: Params) {
   const session = await auth();
@@ -14,15 +12,10 @@ export async function PUT(req: NextRequest, { params }: Params) {
 
   try {
     const { id } = await params;
-    const body = await req.json();
-    const { id: _id, products, subCategories, _count, ...data } = body;
+    const { id: _id, category, products, ...data } = await req.json();
 
-    const category = await prisma.category.update({
-      where: { id },
-      data,
-    });
-
-    return NextResponse.json({ success: true, data: category });
+    const subCategory = await prisma.subCategory.update({ where: { id }, data });
+    return NextResponse.json({ success: true, data: subCategory });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
@@ -36,16 +29,7 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
 
   try {
     const { id } = await params;
-
-    const productCount = await prisma.product.count({ where: { categoryId: id, isActive: true } });
-    if (productCount > 0) {
-      return NextResponse.json(
-        { success: false, error: `Cannot delete — ${productCount} active product(s) use this category` },
-        { status: 409 }
-      );
-    }
-
-    await prisma.category.delete({ where: { id } });
+    await prisma.subCategory.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
