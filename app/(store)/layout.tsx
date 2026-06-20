@@ -7,7 +7,17 @@ export default async function StoreLayout({ children }: { children: React.ReactN
   const config = await getSiteConfig();
   return (
     <>
-      <Navbar storeName={config.storeName} logoUrl={config.logoUrl} phone={config.phone} />
+      <Navbar
+        storeName={config.storeName}
+        tagline={config.navTagline}
+        logoUrl={config.logoUrl}
+        logoSize={config.logoSize}
+        phone={config.phone}
+        topBarEnabled={config.topBarEnabled}
+        topBarLeft={config.topBarLeft}
+        topBarBadge={config.topBarBadge}
+        topBarAnimation={config.topBarAnimation}
+      />
       <CartDrawer />
       <main className="min-h-screen">{children}</main>
       <Footer config={config} />

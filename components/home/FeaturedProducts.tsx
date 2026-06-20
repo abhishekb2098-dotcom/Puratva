@@ -125,13 +125,16 @@ const fallbackProducts = [
   },
 ];
 
+const SPACING = { S: "py-8 md:py-10", M: "py-16 md:py-20", L: "py-20 md:py-28" };
+
 type Props = {
   products?: ProductWithRelations[];
   title?: string;
   subtitle?: string;
+  spacing?: string;
 };
 
-export default function FeaturedProducts({ products, title = "Featured Products", subtitle = "Best sellers, new arrivals, and trending picks — hand-selected for you." }: Props) {
+export default function FeaturedProducts({ products, title = "Featured Products", subtitle = "Best sellers, new arrivals, and trending picks — hand-selected for you.", spacing = "M" }: Props) {
   const addItem = useCartStore((s) => s.addItem);
   const { addItem: addWish, removeItem: removeWish, hasItem } = useWishlistStore();
   const data: any[] = products?.length ? products : fallbackProducts;
@@ -170,7 +173,7 @@ export default function FeaturedProducts({ products, title = "Featured Products"
   };
 
   return (
-    <section className="py-20 bg-white">
+    <section className={`${SPACING[spacing as keyof typeof SPACING] ?? SPACING.M} bg-white`}>
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

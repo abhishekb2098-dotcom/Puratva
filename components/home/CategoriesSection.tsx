@@ -74,11 +74,13 @@ const item = {
   show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
-export default function CategoriesSection({ categories }: Props) {
+const SPACING = { S: "py-8 md:py-10", M: "py-16 md:py-20", L: "py-20 md:py-28" };
+
+export default function CategoriesSection({ categories, spacing = "M" }: Props & { spacing?: string }) {
   if (!categories.length) return null;
 
   return (
-    <section className="py-20 bg-puratva-cream">
+    <section className={`${SPACING[spacing as keyof typeof SPACING] ?? SPACING.M} bg-puratva-cream`}>
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

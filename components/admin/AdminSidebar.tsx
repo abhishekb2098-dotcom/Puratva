@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import NextImage from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Package, Tag, Image, MessageSquare,
@@ -21,18 +22,38 @@ const navItems = [
   { href: "/admin/settings", icon: Settings, label: "Settings" },
 ];
 
-export default function AdminSidebar() {
+export default function AdminSidebar({
+  storeName = "Puratva",
+  logoUrl = "",
+  logoSize = "36",
+}: {
+  storeName?: string;
+  logoUrl?: string;
+  logoSize?: string;
+}) {
   const pathname = usePathname();
+  const size = Math.min(Number(logoSize) || 36, 48);
 
   return (
     <aside className="w-60 bg-puratva-green-dark text-white flex flex-col shrink-0">
       <div className="p-5 border-b border-white/10">
         <Link href="/admin" className="flex items-center gap-2">
-          <div className="w-9 h-9 bg-puratva-gold rounded-full flex items-center justify-center">
-            <Leaf className="w-4 h-4 text-puratva-green-dark" />
-          </div>
+          {logoUrl ? (
+            <NextImage
+              src={logoUrl}
+              alt={storeName}
+              width={size}
+              height={size}
+              style={{ width: `${size}px`, height: `${size}px` }}
+              className="object-contain rounded-lg"
+            />
+          ) : (
+            <div className="w-9 h-9 bg-puratva-gold rounded-full flex items-center justify-center shrink-0">
+              <Leaf className="w-4 h-4 text-puratva-green-dark" />
+            </div>
+          )}
           <div>
-            <div className="font-display font-bold text-lg leading-none">Puratva</div>
+            <div className="font-display font-bold text-lg leading-none">{storeName}</div>
             <div className="text-xs text-white/60">Admin Panel</div>
           </div>
         </Link>

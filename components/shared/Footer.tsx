@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Leaf, Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin } from "lucide-react";
 import type { SiteConfig } from "@/lib/site-config";
 
@@ -10,14 +11,24 @@ export default function Footer({ config }: { config: SiteConfig }) {
           {/* Brand */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-puratva-gold rounded-full flex items-center justify-center">
-                <Leaf className="w-5 h-5 text-puratva-green-dark" />
-              </div>
+              {config.logoUrl ? (
+                <Image
+                  src={config.logoUrl}
+                  alt={config.storeName}
+                  width={Number(config.logoSize) || 40}
+                  height={Number(config.logoSize) || 40}
+                  style={{ width: `${config.logoSize || 40}px`, height: `${config.logoSize || 40}px` }}
+                  className="object-contain"
+                />
+              ) : (
+                <div className="w-10 h-10 bg-puratva-gold rounded-full flex items-center justify-center shrink-0">
+                  <Leaf className="w-5 h-5 text-puratva-green-dark" />
+                </div>
+              )}
               <span className="font-display text-2xl font-bold">{config.storeName}</span>
             </div>
             <p className="text-sm text-puratva-cream/80 leading-relaxed">
-              {config.tagline}. Bringing you 100% natural, farm-fresh organic products.
-              From our farms to your table — pure, traditional, authentic.
+              {config.footerDescription}
             </p>
             <div className="flex gap-3">
               {config.facebook && config.facebook !== "#" && (

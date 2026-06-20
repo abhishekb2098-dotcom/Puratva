@@ -74,6 +74,12 @@
   }
 }
 
+/* Marquee animation for top announcement bar */
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
 /* Swiper custom styles */
 .swiper-pagination-bullet {
   @apply bg-puratva-green opacity-50;

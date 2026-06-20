@@ -32,12 +32,24 @@ const categories = [
 
 export default function Navbar({
   storeName = "Puratva",
+  tagline = "",
   logoUrl = "",
+  logoSize = "40",
   phone = "+91 98765 43210",
+  topBarEnabled = "true",
+  topBarLeft = "Free shipping on orders above ₹499",
+  topBarBadge = "100% Organic Certified",
+  topBarAnimation = "none",
 }: {
   storeName?: string;
+  tagline?: string;
   logoUrl?: string;
+  logoSize?: string;
   phone?: string;
+  topBarEnabled?: string;
+  topBarLeft?: string;
+  topBarBadge?: string;
+  topBarAnimation?: string;
 }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -54,29 +66,42 @@ export default function Navbar({
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
+  const showTopBar = topBarEnabled !== "false";
+
   return (
     <>
       {/* Top bar */}
-      <div className="bg-puratva-green text-puratva-cream text-xs py-2 hidden md:block">
-        <div className="container flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1">
-              <Phone className="w-3 h-3" /> {phone}
-            </span>
-            <span>Free shipping on orders above ₹499</span>
+      {showTopBar && (
+      <div className="bg-puratva-green text-puratva-cream text-xs py-2 hidden md:block overflow-hidden">
+        <div className="container flex justify-between items-center gap-4">
+          {/* Left side */}
+          <div className={`flex items-center gap-4 ${topBarAnimation === "marquee" ? "flex-1 overflow-hidden" : ""}`}>
+            {topBarAnimation === "marquee" ? (
+              <div className="flex items-center gap-8 animate-[marquee_18s_linear_infinite] whitespace-nowrap">
+                <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {phone}</span>
+                <span>{topBarLeft}</span>
+                <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {phone}</span>
+                <span>{topBarLeft}</span>
+              </div>
+            ) : (
+              <>
+                <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {phone}</span>
+                <span>{topBarLeft}</span>
+              </>
+            )}
           </div>
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1">
-              <Leaf className="w-3 h-3" /> 100% Organic Certified
+          {/* Right side */}
+          <div className="flex items-center gap-4 shrink-0">
+            <span className={`flex items-center gap-1 ${topBarAnimation === "pulse" ? "animate-pulse" : ""}`}>
+              <Leaf className="w-3 h-3" /> {topBarBadge}
             </span>
             {session?.user?.role === "ADMIN" && (
-              <Link href="/admin" className="hover:underline">
-                Admin Panel
-              </Link>
+              <Link href="/admin" className="hover:underline">Admin Panel</Link>
             )}
           </div>
         </div>
       </div>
+      )}
 
       {/* Main nav */}
       <header
@@ -91,15 +116,32 @@ export default function Navbar({
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 shrink-0">
             {logoUrl ? (
-              <NextImage src={logoUrl} alt={storeName} width={40} height={40} className="h-10 w-auto object-contain" />
+              <NextImage
+                src={logoUrl}
+                alt={storeName}
+                width={Number(logoSize) || 40}
+                height={Number(logoSize) || 40}
+                style={{ width: `${logoSize || 40}px`, height: `${logoSize || 40}px` }}
+                className="w-auto object-contain"
+              />
             ) : (
-              <div className="w-10 h-10 bg-puratva-green rounded-full flex items-center justify-center">
-                <Leaf className="w-5 h-5 text-white" />
+              <div
+                className="bg-puratva-green rounded-full flex items-center justify-center shrink-0"
+                style={{ width: `${logoSize || 40}px`, height: `${logoSize || 40}px` }}
+              >
+                <Leaf className="w-1/2 h-1/2 text-white" />
               </div>
             )}
-            <span className="font-display text-2xl font-bold text-puratva-green-dark">
-              {storeName}
-            </span>
+            <div className="flex flex-col">
+              <span className="font-display text-2xl font-bold text-puratva-green-dark leading-tight">
+                {storeName}
+              </span>
+              {tagline && (
+                <span className="text-xs text-muted-foreground leading-tight hidden sm:block">
+                  {tagline}
+                </span>
+              )}
+            </div>
           </Link>
 
           {/* Desktop nav */}
