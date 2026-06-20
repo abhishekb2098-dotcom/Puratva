@@ -20,10 +20,11 @@
 
 import { execSync, spawnSync } from "child_process";
 import { existsSync, readFileSync, writeFileSync, unlinkSync } from "fs";
-import { createClient } from "@libsql/client";
 import { fileURLToPath } from "url";
 import { dirname, join, resolve } from "path";
 import { tmpdir } from "os";
+// @libsql/client is imported dynamically after npm install to avoid
+// ERR_MODULE_NOT_FOUND when node_modules is not yet installed
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
@@ -145,6 +146,7 @@ if (SKIP_DB) {
   const migrationSQL = join(ROOT, "prisma/migrations/0001_init/migration.sql");
   if (!existsSync(migrationSQL)) fail(`Migration file not found: ${migrationSQL}`);
 
+  const { createClient } = await import("@libsql/client");
   const client = createClient({ url: envVars.DATABASE_URL, authToken: envVars.TURSO_AUTH_TOKEN });
   const statements = readFileSync(migrationSQL, "utf-8")
     .split("\n").filter((l) => !l.trimStart().startsWith("--")).join("\n")
