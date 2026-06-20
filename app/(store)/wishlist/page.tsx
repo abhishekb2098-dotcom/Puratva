@@ -14,11 +14,13 @@ export default function WishlistPage() {
 
   const moveToCart = (item: any) => {
     addToCart({
+      id: item.productId,
       productId: item.productId,
       name: item.name,
       price: item.price,
       image: item.image,
       quantity: 1,
+      stock: 99,
     });
     removeItem(item.productId);
     toast.success("Moved to cart");
