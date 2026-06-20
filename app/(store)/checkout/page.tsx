@@ -10,9 +10,10 @@ import { useCartStore } from "@/store/cart";
 import { formatPrice } from "@/lib/utils";
 import toast from "react-hot-toast";
 
-declare global {
-  interface Window { Razorpay: any }
-}
+// TODO: Uncomment when Razorpay credentials are available
+// declare global {
+//   interface Window { Razorpay: any }
+// }
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -45,62 +46,67 @@ export default function CheckoutPage() {
     setStep("payment");
   };
 
+  // TODO: Uncomment and replace with real Razorpay integration when credentials are available
   const handlePayment = async () => {
-    setLoading(true);
-    try {
-      const orderRes = await fetch("/api/payment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: total, items, address }),
-      });
-      const orderData = await orderRes.json();
-      if (!orderData.success) throw new Error(orderData.error);
-
-      const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: orderData.razorpayOrder.amount,
-        currency: "INR",
-        name: "Puratva",
-        description: "Organic Products Order",
-        order_id: orderData.razorpayOrder.id,
-        handler: async (response: any) => {
-          const verifyRes = await fetch("/api/payment/verify", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              ...response,
-              orderId: orderData.orderId,
-            }),
-          });
-          const verifyData = await verifyRes.json();
-          if (verifyData.success) {
-            clearCart();
-            toast.success("Order placed successfully!");
-            router.push(`/orders/${orderData.orderId}`);
-          } else {
-            toast.error("Payment verification failed");
-          }
-        },
-        prefill: {
-          name: address.fullName,
-          email: session?.user?.email,
-          contact: address.phone,
-        },
-        theme: { color: "#2d6a4f" },
-      };
-
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-    } catch (err: any) {
-      toast.error(err.message || "Payment failed");
-    } finally {
-      setLoading(false);
-    }
+    toast.error("Payment gateway not configured yet. Please check back soon.");
   };
+
+  // const handlePayment = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const orderRes = await fetch("/api/payment", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ amount: total, items, address }),
+  //     });
+  //     const orderData = await orderRes.json();
+  //     if (!orderData.success) throw new Error(orderData.error);
+
+  //     const options = {
+  //       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+  //       amount: orderData.razorpayOrder.amount,
+  //       currency: "INR",
+  //       name: "Puratva",
+  //       description: "Organic Products Order",
+  //       order_id: orderData.razorpayOrder.id,
+  //       handler: async (response: any) => {
+  //         const verifyRes = await fetch("/api/payment/verify", {
+  //           method: "POST",
+  //           headers: { "Content-Type": "application/json" },
+  //           body: JSON.stringify({
+  //             ...response,
+  //             orderId: orderData.orderId,
+  //           }),
+  //         });
+  //         const verifyData = await verifyRes.json();
+  //         if (verifyData.success) {
+  //           clearCart();
+  //           toast.success("Order placed successfully!");
+  //           router.push(`/orders/${orderData.orderId}`);
+  //         } else {
+  //           toast.error("Payment verification failed");
+  //         }
+  //       },
+  //       prefill: {
+  //         name: address.fullName,
+  //         email: session?.user?.email,
+  //         contact: address.phone,
+  //       },
+  //       theme: { color: "#2d6a4f" },
+  //     };
+
+  //     const rzp = new window.Razorpay(options);
+  //     rzp.open();
+  //   } catch (err: any) {
+  //     toast.error(err.message || "Payment failed");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <>
-      <script src="https://checkout.razorpay.com/v1/checkout.js" async />
+      {/* <script src="https://checkout.razorpay.com/v1/checkout.js" async /> */}
       <div className="container py-10">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center justify-between mb-8">
@@ -167,7 +173,7 @@ export default function CheckoutPage() {
                     <h2 className="font-display text-xl font-bold mb-3 flex items-center gap-2">
                       <ShieldCheck className="w-5 h-5 text-puratva-green" /> Secure Payment
                     </h2>
-                    <p className="text-sm text-muted-foreground mb-4">Powered by Razorpay. All transactions are secured with 256-bit SSL encryption.</p>
+                    <p className="text-sm text-muted-foreground mb-4">Payment gateway coming soon. Your order details are saved.</p>
                     <div className="bg-puratva-cream rounded-xl p-4 text-sm space-y-1 mb-5">
                       <div className="font-medium">Delivering to:</div>
                       <div className="text-muted-foreground">{address.fullName}, {address.phone}</div>
