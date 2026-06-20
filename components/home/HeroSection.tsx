@@ -59,6 +59,7 @@ type Props = {
 };
 
 export default function HeroSection({ banners }: Props) {
+  console.log("banners", banners);
   const slides = banners?.length ? banners : fallbackSlides;
   const [current, setCurrent] = useState(0);
 
