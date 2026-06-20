@@ -4,10 +4,11 @@ import { notFound } from "next/navigation";
 import ProductGrid from "@/components/shop/ProductGrid";
 import ShopFilters from "@/components/shop/ShopFilters";
 
-type Props = { params: { category: string }; searchParams: any };
+type Props = { params: Promise<{ category: string }>; searchParams: Promise<any> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const category = await prisma.category.findUnique({ where: { slug: params.category } });
+  const { category: slug } = await params;
+  const category = await prisma.category.findUnique({ where: { slug } });
   if (!category) return { title: "Category Not Found" };
   return {
     title: `${category.name} – Organic ${category.name}`,
@@ -16,19 +17,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function CategoryPage({ params, searchParams }: Props) {
+  const { category: slug } = await params;
+  const sp = await searchParams;
+
   const category = await prisma.category.findUnique({
-    where: { slug: params.category },
+    where: { slug },
     include: { subCategories: true },
   });
   if (!category) notFound();
 
-  const page = parseInt(searchParams?.page || "1");
+  const page = parseInt(sp?.page || "1");
   const limit = 12;
   const skip = (page - 1) * limit;
-  const subCategorySlug = searchParams?.sub;
-  const sort = searchParams?.sort || "featured";
-  const minPrice = searchParams?.minPrice ? parseFloat(searchParams.minPrice) : undefined;
-  const maxPrice = searchParams?.maxPrice ? parseFloat(searchParams.maxPrice) : undefined;
+  const subCategorySlug = sp?.sub;
+  const sort = sp?.sort || "featured";
+  const minPrice = sp?.minPrice ? parseFloat(sp.minPrice) : undefined;
+  const maxPrice = sp?.maxPrice ? parseFloat(sp.maxPrice) : undefined;
 
   const where: any = { isActive: true, categoryId: category.id };
   if (subCategorySlug) where.subCategory = { slug: subCategorySlug };
@@ -73,7 +77,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
           {category.subCategories.length > 0 && (
             <div className="flex gap-2 mt-4 flex-wrap">
               <a
-                href={`/shop/${params.category}`}
+                href={`/shop/${slug}`}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${!subCategorySlug ? "bg-white text-puratva-green" : "bg-white/20 hover:bg-white/30 text-white"}`}
               >
                 All
@@ -81,7 +85,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
               {category.subCategories.map((sub) => (
                 <a
                   key={sub.id}
-                  href={`/shop/${params.category}?sub=${sub.slug}`}
+                  href={`/shop/${slug}?sub=${sub.slug}`}
                   className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${subCategorySlug === sub.slug ? "bg-white text-puratva-green" : "bg-white/20 hover:bg-white/30 text-white"}`}
                 >
                   {sub.name}
@@ -94,13 +98,13 @@ export default async function CategoryPage({ params, searchParams }: Props) {
 
       <div className="container py-8">
         <div className="flex gap-8">
-          <ShopFilters categories={allCategories} searchParams={searchParams} currentCategory={params.category} />
+          <ShopFilters categories={allCategories} searchParams={sp} currentCategory={slug} />
           <ProductGrid
             products={products as any}
             total={total}
             page={page}
             limit={limit}
-            searchParams={searchParams}
+            searchParams={sp}
           />
         </div>
       </div>

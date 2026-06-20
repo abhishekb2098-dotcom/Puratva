@@ -4,11 +4,12 @@ import { Metadata } from "next";
 import ProductDetail from "@/components/shop/ProductDetail";
 import FeaturedProducts from "@/components/home/FeaturedProducts";
 
-type Props = { params: { slug: string } };
+type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
   const product = await prisma.product.findUnique({
-    where: { slug: params.slug },
+    where: { slug },
     select: { name: true, metaTitle: true, metaDesc: true, images: { take: 1 } },
   });
   if (!product) return { title: "Product Not Found" };
@@ -22,8 +23,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ProductPage({ params }: Props) {
+  const { slug } = await params;
   const product = await prisma.product.findUnique({
-    where: { slug: params.slug, isActive: true },
+    where: { slug, isActive: true },
     include: {
       category: true,
       subCategory: true,

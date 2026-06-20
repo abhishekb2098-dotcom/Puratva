@@ -2,15 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 
-type Params = { params: { id: string } };
+type Params = { params: Promise<{ id: string }> };
 
 export async function GET(req: NextRequest, { params }: Params) {
   const session = await auth();
   if (!session) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
 
   try {
+    const { id } = await params;
     const order = await prisma.order.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         user: { select: { name: true, email: true, phone: true } },
         address: true,
@@ -40,8 +41,9 @@ export async function PUT(req: NextRequest, { params }: Params) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
   }
   try {
+    const { id } = await params;
     const body = await req.json();
-    const order = await prisma.order.update({ where: { id: params.id }, data: body });
+    const order = await prisma.order.update({ where: { id }, data: body });
     return NextResponse.json({ success: true, data: order });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

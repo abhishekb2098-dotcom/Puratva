@@ -2,14 +2,15 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import ProductForm from "@/components/admin/ProductForm";
 
-type Props = { params: { id: string } };
+type Props = { params: Promise<{ id: string }> };
 
 export default async function ProductEditPage({ params }: Props) {
-  const isNew = params.id === "new";
+  const { id } = await params;
+  const isNew = id === "new";
 
   const [product, categories] = await Promise.all([
     isNew ? null : prisma.product.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { images: { orderBy: { sortOrder: "asc" } }, variants: true, tags: true },
     }),
     prisma.category.findMany({
