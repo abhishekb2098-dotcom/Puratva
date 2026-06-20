@@ -9,7 +9,13 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "ui-avatars.com" },
     ],
   },
-  serverExternalPackages: ["@prisma/client", "bcryptjs", "razorpay"],
+  serverExternalPackages: [
+    "@prisma/client",
+    "@prisma/adapter-libsql",
+    "@libsql/client",
+    "bcryptjs",
+    "razorpay",
+  ],
 };
 
 export default nextConfig;
