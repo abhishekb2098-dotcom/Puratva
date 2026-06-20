@@ -3,6 +3,7 @@ import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import Providers from "@/components/shared/Providers";
+import SiteConfigStyle from "@/components/shared/SiteConfigStyle";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -59,6 +60,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <SiteConfigStyle />
+      </head>
       <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
         <Providers>
           {children}

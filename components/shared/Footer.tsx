@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Leaf, Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin } from "lucide-react";
+import type { SiteConfig } from "@/lib/site-config";
 
-export default function Footer() {
+export default function Footer({ config }: { config: SiteConfig }) {
   return (
     <footer className="bg-puratva-green-dark text-puratva-cream">
       <div className="container py-16">
@@ -12,22 +13,46 @@ export default function Footer() {
               <div className="w-10 h-10 bg-puratva-gold rounded-full flex items-center justify-center">
                 <Leaf className="w-5 h-5 text-puratva-green-dark" />
               </div>
-              <span className="font-display text-2xl font-bold">Puratva</span>
+              <span className="font-display text-2xl font-bold">{config.storeName}</span>
             </div>
             <p className="text-sm text-puratva-cream/80 leading-relaxed">
-              Bringing you 100% natural, farm-fresh organic products. From our
-              farms to your table — pure, traditional, authentic.
+              {config.tagline}. Bringing you 100% natural, farm-fresh organic products.
+              From our farms to your table — pure, traditional, authentic.
             </p>
             <div className="flex gap-3">
-              {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
-                <a
-                  key={i}
-                  href="#"
-                  className="w-9 h-9 bg-puratva-cream/10 hover:bg-puratva-gold/80 rounded-full flex items-center justify-center transition-colors"
-                >
-                  <Icon className="w-4 h-4" />
+              {config.facebook && config.facebook !== "#" && (
+                <a href={config.facebook} target="_blank" rel="noopener noreferrer"
+                  className="w-9 h-9 bg-puratva-cream/10 hover:bg-puratva-gold/80 rounded-full flex items-center justify-center transition-colors">
+                  <Facebook className="w-4 h-4" />
                 </a>
-              ))}
+              )}
+              {config.instagram && config.instagram !== "#" && (
+                <a href={config.instagram} target="_blank" rel="noopener noreferrer"
+                  className="w-9 h-9 bg-puratva-cream/10 hover:bg-puratva-gold/80 rounded-full flex items-center justify-center transition-colors">
+                  <Instagram className="w-4 h-4" />
+                </a>
+              )}
+              {config.twitter && config.twitter !== "#" && (
+                <a href={config.twitter} target="_blank" rel="noopener noreferrer"
+                  className="w-9 h-9 bg-puratva-cream/10 hover:bg-puratva-gold/80 rounded-full flex items-center justify-center transition-colors">
+                  <Twitter className="w-4 h-4" />
+                </a>
+              )}
+              {config.youtube && config.youtube !== "#" && (
+                <a href={config.youtube} target="_blank" rel="noopener noreferrer"
+                  className="w-9 h-9 bg-puratva-cream/10 hover:bg-puratva-gold/80 rounded-full flex items-center justify-center transition-colors">
+                  <Youtube className="w-4 h-4" />
+                </a>
+              )}
+              {/* Show all icons as placeholders if all are "#" */}
+              {[config.facebook, config.instagram, config.twitter, config.youtube].every(s => !s || s === "#") &&
+                [Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
+                  <a key={i} href="#"
+                    className="w-9 h-9 bg-puratva-cream/10 hover:bg-puratva-gold/80 rounded-full flex items-center justify-center transition-colors">
+                    <Icon className="w-4 h-4" />
+                  </a>
+                ))
+              }
             </div>
           </div>
 
@@ -79,19 +104,18 @@ export default function Footer() {
             <ul className="space-y-3 text-sm text-puratva-cream/80">
               <li className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-puratva-gold" />
-                <span>123 Organic Farm Road, Green Valley, Mumbai 400001</span>
+                <span>{config.address}</span>
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-puratva-gold" />
-                <a href="tel:+919876543210" className="hover:text-puratva-gold">+91 98765 43210</a>
+                <a href={`tel:${config.phone}`} className="hover:text-puratva-gold">{config.phone}</a>
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-puratva-gold" />
-                <a href="mailto:hello@puratva.com" className="hover:text-puratva-gold">hello@puratva.com</a>
+                <a href={`mailto:${config.email}`} className="hover:text-puratva-gold">{config.email}</a>
               </li>
             </ul>
 
-            {/* Newsletter mini */}
             <div className="mt-4">
               <p className="text-xs mb-2 text-puratva-cream/70">Subscribe for offers & updates</p>
               <form className="flex gap-2">
@@ -102,7 +126,7 @@ export default function Footer() {
                 />
                 <button
                   type="submit"
-                  className="bg-puratva-gold text-puratva-green-dark px-4 py-2 rounded-lg text-sm font-medium hover:bg-puratva-gold-light transition-colors"
+                  className="bg-puratva-gold text-puratva-green-dark px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
                 >
                   Go
                 </button>
@@ -114,7 +138,7 @@ export default function Footer() {
 
       <div className="border-t border-puratva-cream/10">
         <div className="container py-4 flex flex-col md:flex-row justify-between items-center gap-2 text-xs text-puratva-cream/60">
-          <span>© 2024 Puratva. All rights reserved.</span>
+          <span>© {new Date().getFullYear()} {config.storeName}. All rights reserved.</span>
           <div className="flex gap-4">
             <Link href="/privacy" className="hover:text-puratva-gold">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-puratva-gold">Terms of Service</Link>
