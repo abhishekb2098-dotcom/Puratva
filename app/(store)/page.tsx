@@ -8,7 +8,7 @@ import NewsletterSection from "@/components/home/NewsletterSection";
 
 async function getData() {
   try {
-    const [banners, bestSellers, newArrivals, testimonials] = await Promise.all([
+    const [banners, categories, bestSellers, newArrivals, testimonials] = await Promise.all([
       prisma.banner.findMany({
         where: {
           isActive: true,
@@ -19,6 +19,17 @@ async function getData() {
           AND: [
             { OR: [{ endsAt: null }, { endsAt: { gte: new Date() } }] },
           ],
+        },
+        orderBy: { sortOrder: "asc" },
+      }),
+      prisma.category.findMany({
+        where: { isActive: true },
+        include: {
+          _count: {
+            select: {
+              products: { where: { isActive: true } },
+            },
+          },
         },
         orderBy: { sortOrder: "asc" },
       }),
@@ -52,19 +63,19 @@ async function getData() {
         take: 6,
       }),
     ]);
-    return { banners, bestSellers, newArrivals, testimonials };
+    return { banners, categories, bestSellers, newArrivals, testimonials };
   } catch {
-    return { banners: [], bestSellers: [], newArrivals: [], testimonials: [] };
+    return { banners: [], categories: [], bestSellers: [], newArrivals: [], testimonials: [] };
   }
 }
 
 export default async function HomePage() {
-  const { banners, bestSellers, newArrivals, testimonials } = await getData();
+  const { banners, categories, bestSellers, newArrivals, testimonials } = await getData();
 
   return (
     <>
       <HeroSection banners={banners} />
-      <CategoriesSection />
+      <CategoriesSection categories={categories as any} />
       <FeaturedProducts
         products={bestSellers as any}
         title="Best Sellers"

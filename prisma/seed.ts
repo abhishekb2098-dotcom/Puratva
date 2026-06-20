@@ -34,11 +34,24 @@ async function main() {
   for (const cat of categoriesData) {
     const c = await prisma.category.upsert({
       where: { slug: cat.slug },
-      update: {},
+      update: cat,
       create: { ...cat, isActive: true },
     });
     categories[cat.slug] = c;
     console.log(`✅ Category: ${c.name}`);
+  }
+
+  const categoryImages: Record<string, string> = {
+    oils: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400&q=80",
+    ghee: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=400&q=80",
+    pickles: "https://images.unsplash.com/photo-1568158879083-c42860933ed7?w=400&q=80",
+    premixes: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80",
+    pulses: "/images/categories/pulses.png",
+    "dairy-products": "https://images.unsplash.com/photo-1628088062854-d1870b4553da?w=400&q=80",
+  };
+
+  for (const [slug, image] of Object.entries(categoryImages)) {
+    await prisma.category.update({ where: { slug }, data: { image } });
   }
 
   // Sub-categories
