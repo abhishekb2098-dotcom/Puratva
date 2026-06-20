@@ -58,27 +58,38 @@ function capture(cmd) {
   catch { return null; }
 }
 
-// Set a single Vercel env var using temp-file stdin redirect (Windows-safe)
+// Set a single Vercel env var — writes value to temp file, pipes via stdin
 function vercelEnvSet(key, value, environment = "production") {
-  const tmp = join(tmpdir(), `vercel_env_${Date.now()}.txt`);
+  const tmp = join(tmpdir(), `ve_${key}_${Date.now()}.txt`);
   try {
-    writeFileSync(tmp, value, "utf-8");
-    // Remove existing first (ignore failure if not found)
+    writeFileSync(tmp, value + "\n", "utf-8");
+
+    // Remove existing silently (ok if not found)
     spawnSync("vercel", ["env", "rm", key, environment, "--yes"], {
       cwd: ROOT, stdio: "pipe",
     });
-    // Add with value piped from file
-    const result = spawnSync("vercel", ["env", "add", key, environment], {
+
+    // Attempt 1: spawnSync with input string (works when no special shell chars)
+    const r1 = spawnSync("vercel", ["env", "add", key, environment], {
       cwd: ROOT,
       input: value + "\n",
       encoding: "utf-8",
       stdio: ["pipe", "pipe", "pipe"],
       shell: false,
     });
-    if (result.status === 0) return true;
-    // Fallback: shell echo pipe (bash / git-bash)
-    const fb = capture(`echo "${value.replace(/"/g, '\\"')}" | vercel env add ${key} ${environment} --yes`);
-    return fb !== null;
+    if (r1.status === 0) return true;
+
+    // Attempt 2: redirect from temp file via cmd.exe (Windows)
+    const r2 = spawnSync("cmd", ["/c", `vercel env add ${key} ${environment} < "${tmp}"`], {
+      cwd: ROOT, stdio: "pipe", shell: false,
+    });
+    if (r2.status === 0) return true;
+
+    // Attempt 3: redirect from temp file via bash (Git Bash / WSL)
+    const r3 = spawnSync("bash", ["-c", `vercel env add ${key} ${environment} < "${tmp.replace(/\\/g, '/')}"`], {
+      cwd: ROOT, stdio: "pipe", shell: false,
+    });
+    return r3.status === 0;
   } finally {
     try { unlinkSync(tmp); } catch {}
   }
