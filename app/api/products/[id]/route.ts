@@ -41,9 +41,8 @@ export async function PUT(req: NextRequest, { params }: Params) {
       : null;
     const effectiveStock = variantStock !== null ? variantStock : (Number(raw.stock) || 0);
     let computedStatus = raw.status || "active";
-    if (computedStatus !== "coming_soon") {
+    if (computedStatus !== "coming_soon" && computedStatus !== "out_of_stock") {
       if (effectiveStock <= 0) computedStatus = "out_of_stock";
-      else if (computedStatus === "out_of_stock") computedStatus = "active";
     }
 
     const prevProduct = await prisma.product.findUnique({ where: { id }, select: { status: true, name: true } });
