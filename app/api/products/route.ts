@@ -14,14 +14,14 @@ export async function GET(req: NextRequest) {
 
   const where: any = { isActive: true };
   if (category) where.category = { slug: category };
-  if (search) where.name = { contains: search, mode: "insensitive" };
+  if (search) where.name = { contains: search };
   if (featured === "true") where.isFeatured = true;
   if (bestSeller === "true") where.isBestSeller = true;
 
   const orderBy: any =
-    sort === "price-asc" ? { price: "asc" }
+    sort === "price-asc"  ? { price: "asc" }
     : sort === "price-desc" ? { price: "desc" }
-    : sort === "newest" ? { createdAt: "desc" }
+    : sort === "newest"     ? { createdAt: "desc" }
     : { sortOrder: "asc" };
 
   try {
@@ -46,15 +46,26 @@ export async function GET(req: NextRequest) {
   }
 }
 
+// Resolve effective stock across product + all variants
+function resolveStatus(stock: number, variants: any[], requestedStatus: string): string {
+  if (requestedStatus === "coming_soon") return "coming_soon";
+  const variantStock = variants?.length
+    ? variants.reduce((s: number, v: any) => s + (parseInt(v.stock) || 0), 0)
+    : null;
+  const effectiveStock = variantStock !== null ? variantStock : stock;
+  if (effectiveStock <= 0) return "out_of_stock";
+  if (requestedStatus === "out_of_stock") return "active"; // auto-restore when re-stocked
+  return requestedStatus || "active";
+}
+
 function sanitizeProductData(data: any) {
   return {
     ...data,
-    subCategoryId: data.subCategoryId || null,
-    comparePrice:  data.comparePrice  || null,
-    costPrice:     data.costPrice     || null,
-    weight:        data.weight        || null,
-    sku:           data.sku           || null,
-    status:        data.status        || "active",
+    subCategoryId: data.subCategoryId  || null,
+    comparePrice:  data.comparePrice   || null,
+    costPrice:     data.costPrice      || null,
+    weight:        data.weight         || null,
+    sku:           data.sku            || null,
   };
 }
 
@@ -69,9 +80,16 @@ export async function POST(req: NextRequest) {
     const { images, variants, tags, ...raw } = body;
     const productData = sanitizeProductData(raw);
 
+    const computedStatus = resolveStatus(
+      Number(productData.stock) || 0,
+      variants,
+      productData.status || "active"
+    );
+
     const product = await prisma.product.create({
       data: {
         ...productData,
+        status: computedStatus,
         images: images?.length
           ? { create: images.map((img: any, i: number) => ({ url: img.url, isPrimary: img.isPrimary || i === 0, sortOrder: i })) }
           : undefined,
@@ -83,6 +101,18 @@ export async function POST(req: NextRequest) {
           : undefined,
       },
     });
+
+    if (computedStatus === "out_of_stock") {
+      await prisma.notification.create({
+        data: {
+          type: "out_of_stock",
+          title: "Product Out of Stock",
+          message: `"${product.name}" was added with 0 stock and is marked out of stock.`,
+          data: JSON.stringify({ productId: product.id, slug: product.slug }),
+        },
+      });
+    }
+
     return NextResponse.json({ success: true, data: product });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

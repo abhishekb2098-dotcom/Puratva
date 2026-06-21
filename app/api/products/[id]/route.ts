@@ -34,6 +34,20 @@ export async function PUT(req: NextRequest, { params }: Params) {
     const { id } = await params;
     const body = await req.json();
     const { images, variants, tags, id: _id, categoryId, subCategoryId, category, subCategory, reviews, ...raw } = body;
+
+    // Resolve effective status from stock
+    const variantStock = variants?.length
+      ? variants.reduce((s: number, v: any) => s + (parseInt(v.stock) || 0), 0)
+      : null;
+    const effectiveStock = variantStock !== null ? variantStock : (Number(raw.stock) || 0);
+    let computedStatus = raw.status || "active";
+    if (computedStatus !== "coming_soon") {
+      if (effectiveStock <= 0) computedStatus = "out_of_stock";
+      else if (computedStatus === "out_of_stock") computedStatus = "active";
+    }
+
+    const prevProduct = await prisma.product.findUnique({ where: { id }, select: { status: true, name: true } });
+
     const data = {
       ...raw,
       subCategoryId: subCategoryId || null,
@@ -41,7 +55,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
       costPrice:     raw.costPrice     || null,
       weight:        raw.weight        || null,
       sku:           raw.sku           || null,
-      status:        raw.status        || "active",
+      status:        computedStatus,
     };
 
     await prisma.$transaction([
@@ -67,6 +81,19 @@ export async function PUT(req: NextRequest, { params }: Params) {
           : undefined,
       },
     });
+
+    // Notify admin when product transitions to out_of_stock
+    if (computedStatus === "out_of_stock" && prevProduct?.status !== "out_of_stock") {
+      await prisma.notification.create({
+        data: {
+          type: "out_of_stock",
+          title: "Product Out of Stock",
+          message: `"${prevProduct?.name}" has run out of stock and needs restocking.`,
+          data: JSON.stringify({ productId: product.id, slug: product.slug }),
+        },
+      });
+    }
+
     return NextResponse.json({ success: true, data: product });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

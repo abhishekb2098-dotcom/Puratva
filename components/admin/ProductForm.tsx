@@ -119,6 +119,9 @@ export default function ProductForm({ product, categories, isNew }: Props) {
   };
 
   const nameValue = watch("name");
+  const statusValue = watch("status");
+  const isComingSoon = statusValue === "coming_soon";
+
   const autofillSlug = () => {
     if (nameValue && isNew) setValue("slug", slugify(nameValue));
   };
@@ -167,6 +170,11 @@ export default function ProductForm({ product, categories, isNew }: Props) {
         {/* Pricing */}
         <div className="bg-white rounded-2xl border p-6 space-y-4">
           <h2 className="font-bold text-lg">Pricing & Inventory</h2>
+          {isComingSoon && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-2.5 text-sm text-yellow-700">
+              Stock, unit, SKU and weight are hidden for <strong>Coming Soon</strong> products.
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-1">Price (₹) *</label>
@@ -186,6 +194,7 @@ export default function ProductForm({ product, categories, isNew }: Props) {
                 className="w-full border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-puratva-green/30"
               />
             </div>
+            {!isComingSoon && (<>
             <div>
               <label className="block text-sm font-medium mb-1">Stock *</label>
               <input
@@ -210,11 +219,12 @@ export default function ProductForm({ product, categories, isNew }: Props) {
               <label className="block text-sm font-medium mb-1">Weight (g)</label>
               <input {...register("weight", { valueAsNumber: true })} type="number" className="w-full border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-puratva-green/30" />
             </div>
+            </>)}
           </div>
         </div>
 
-        {/* Variants */}
-        <div className="bg-white rounded-2xl border p-6">
+        {/* Variants — hidden for Coming Soon */}
+        {!isComingSoon && <div className="bg-white rounded-2xl border p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="font-bold text-lg">Product Variants</h2>
             <button type="button" onClick={() => setVariants([...variants, { name: "", value: "", price: "", stock: "0" }])} className="flex items-center gap-1 text-sm text-puratva-green hover:underline">
@@ -244,7 +254,7 @@ export default function ProductForm({ product, categories, isNew }: Props) {
               </button>
             </div>
           ))}
-        </div>
+        </div>}
 
         {/* Images */}
         <div className="bg-white rounded-2xl border p-6">

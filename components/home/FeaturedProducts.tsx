@@ -220,8 +220,19 @@ export default function FeaturedProducts({ products, title = "Featured Products"
                       src={primaryImg || "/images/placeholder.jpg"}
                       alt={p.name}
                       fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      className={`object-cover group-hover:scale-105 transition-transform duration-500 ${p.status === "out_of_stock" || p.status === "coming_soon" ? "opacity-70" : ""}`}
                     />
+                    {/* Status overlay */}
+                    {p.status === "out_of_stock" && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                        <span className="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">Out of Stock</span>
+                      </div>
+                    )}
+                    {p.status === "coming_soon" && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                        <span className="bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full">Coming Soon</span>
+                      </div>
+                    )}
                     {/* Badges */}
                     <div className="absolute top-2 left-2 flex flex-col gap-1">
                       {discount > 0 && (
@@ -285,14 +296,18 @@ export default function FeaturedProducts({ products, title = "Featured Products"
                           </span>
                         )}
                       </div>
-                      <button
-                        onClick={() => handleAddToCart(p)}
-                        disabled={p.stock === 0}
-                        className="flex items-center gap-1 bg-puratva-green text-white text-xs px-3 py-1.5 rounded-lg hover:bg-puratva-green-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <ShoppingCart className="w-3.5 h-3.5" />
-                        {p.stock === 0 ? "Out of Stock" : "Add"}
-                      </button>
+                      {p.status === "coming_soon" ? (
+                        <span className="text-xs px-3 py-1.5 bg-yellow-100 text-yellow-700 font-semibold rounded-lg">Coming Soon</span>
+                      ) : (
+                        <button
+                          onClick={() => handleAddToCart(p)}
+                          disabled={p.status === "out_of_stock" || p.stock === 0}
+                          className="flex items-center gap-1 bg-puratva-green text-white text-xs px-3 py-1.5 rounded-lg hover:bg-puratva-green-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <ShoppingCart className="w-3.5 h-3.5" />
+                          {p.status === "out_of_stock" || p.stock === 0 ? "Sold Out" : "Add"}
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>

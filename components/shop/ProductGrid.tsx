@@ -71,7 +71,17 @@ export default function ProductGrid({ products, total, page, limit, searchParams
             >
               <div className="bg-white rounded-2xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
                 <div className="relative aspect-square overflow-hidden bg-muted">
-                  <Image src={img || "/images/placeholder.jpg"} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <Image src={img || "/images/placeholder.jpg"} alt={p.name} fill className={`object-cover group-hover:scale-105 transition-transform duration-500 ${(p as any).status === "out_of_stock" || (p as any).status === "coming_soon" ? "opacity-70" : ""}`} />
+                  {(p as any).status === "out_of_stock" && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                      <span className="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">Out of Stock</span>
+                    </div>
+                  )}
+                  {(p as any).status === "coming_soon" && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                      <span className="bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full">Coming Soon</span>
+                    </div>
+                  )}
                   <div className="absolute top-2 left-2 flex flex-col gap-1">
                     {discount > 0 && <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">-{discount}%</span>}
                     {p.isBestSeller && <span className="bg-puratva-gold text-puratva-green-dark text-xs font-bold px-2 py-0.5 rounded-full">Best Seller</span>}
@@ -112,14 +122,18 @@ export default function ProductGrid({ products, total, page, limit, searchParams
                         <span className="text-xs text-muted-foreground line-through ml-1">{formatPrice(p.comparePrice)}</span>
                       )}
                     </div>
-                    <button
-                      onClick={() => handleAddToCart(p)}
-                      disabled={p.stock === 0}
-                      className="flex items-center gap-1 bg-puratva-green text-white text-xs px-2.5 py-1.5 rounded-lg hover:bg-puratva-green-dark transition-colors disabled:opacity-50"
-                    >
-                      <ShoppingCart className="w-3 h-3" />
-                      {p.stock === 0 ? "Sold Out" : "Add"}
-                    </button>
+                    {(p as any).status === "coming_soon" ? (
+                      <span className="text-xs px-2.5 py-1.5 bg-yellow-100 text-yellow-700 font-semibold rounded-lg">Coming Soon</span>
+                    ) : (
+                      <button
+                        onClick={() => handleAddToCart(p)}
+                        disabled={(p as any).status === "out_of_stock" || p.stock === 0}
+                        className="flex items-center gap-1 bg-puratva-green text-white text-xs px-2.5 py-1.5 rounded-lg hover:bg-puratva-green-dark transition-colors disabled:opacity-50"
+                      >
+                        <ShoppingCart className="w-3 h-3" />
+                        {(p as any).status === "out_of_stock" || p.stock === 0 ? "Sold Out" : "Add"}
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
