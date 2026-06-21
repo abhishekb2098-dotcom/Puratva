@@ -10,6 +10,12 @@ import toast from "react-hot-toast";
 import { Upload, X, Plus, Minus } from "lucide-react";
 import { slugify } from "@/lib/utils";
 
+const PRODUCT_STATUSES = [
+  { value: "active",       label: "Active",       color: "bg-green-100 text-green-700"  },
+  { value: "out_of_stock", label: "Out of Stock",  color: "bg-red-100 text-red-700"     },
+  { value: "coming_soon",  label: "Coming Soon",   color: "bg-yellow-100 text-yellow-700" },
+] as const;
+
 const schema = z.object({
   name: z.string().min(2),
   slug: z.string().min(2),
@@ -23,6 +29,7 @@ const schema = z.object({
   weight: z.number().optional(),
   categoryId: z.string().min(1),
   subCategoryId: z.string().optional(),
+  status: z.enum(["active", "out_of_stock", "coming_soon"]).default("active"),
   isActive: z.boolean().default(true),
   isFeatured: z.boolean().default(false),
   isBestSeller: z.boolean().default(false),
@@ -58,6 +65,7 @@ export default function ProductForm({ product, categories, isNew }: Props) {
       ...product,
       price: product?.price || 0,
       stock: product?.stock || 0,
+      status: product?.status || "active",
     },
   });
 
@@ -244,14 +252,19 @@ export default function ProductForm({ product, categories, isNew }: Props) {
           <label className="flex flex-col items-center justify-center border-2 border-dashed border-puratva-green/30 rounded-xl p-8 cursor-pointer hover:bg-puratva-cream/50 transition-colors mb-4">
             <Upload className="w-8 h-8 text-puratva-green mb-2" />
             <span className="text-sm font-medium">{uploading ? "Uploading..." : "Click to upload images"}</span>
-            <span className="text-xs text-muted-foreground">PNG, JPG up to 5MB each</span>
-            <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageUpload} disabled={uploading} />
+            <span className="text-xs text-muted-foreground">PNG, JPG, GIF, WebP up to 10MB each</span>
+            <input type="file" accept="image/*,.gif" multiple className="hidden" onChange={handleImageUpload} disabled={uploading} />
           </label>
           <div className="grid grid-cols-4 gap-3">
             {images.map((img, i) => (
               <div key={i} className="relative group">
                 <div className="relative aspect-square rounded-xl overflow-hidden border">
-                  <Image src={img.url} alt="" fill className="object-cover" />
+                  {img.url.toLowerCase().endsWith(".gif") ? (
+                    // Use <img> for GIFs to preserve animation
+                    <img src={img.url} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <Image src={img.url} alt="" fill className="object-cover" unoptimized={img.url.includes("data:")} />
+                  )}
                 </div>
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center gap-2">
                   <button type="button" onClick={() => setImages(images.map((im, j) => ({ ...im, isPrimary: j === i })))} className="text-white text-xs bg-puratva-green px-2 py-1 rounded">
@@ -312,7 +325,24 @@ export default function ProductForm({ product, categories, isNew }: Props) {
         </div>
 
         <div className="bg-white rounded-2xl border p-5">
-          <h3 className="font-bold mb-4">Product Status</h3>
+          <h3 className="font-bold mb-3">Availability</h3>
+          <div className="grid grid-cols-1 gap-2">
+            {PRODUCT_STATUSES.map(({ value, label, color }) => (
+              <label key={value} className="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-muted/50">
+                <input
+                  type="radio"
+                  value={value}
+                  {...register("status")}
+                  className="accent-puratva-green"
+                />
+                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${color}`}>{label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl border p-5">
+          <h3 className="font-bold mb-4">Product Flags</h3>
           <div className="space-y-3">
             {[
               { key: "isActive", label: "Active (visible in store)" },

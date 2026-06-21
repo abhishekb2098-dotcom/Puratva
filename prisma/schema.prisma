@@ -127,6 +127,7 @@ model Product {
   isBestSeller   Boolean  @default(false)
   isNewArrival   Boolean  @default(false)
   isOrganic      Boolean  @default(true)
+  status         String   @default("active")
   metaTitle      String?
   metaDesc       String?
   metaKeywords   String?

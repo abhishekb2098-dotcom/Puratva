@@ -33,7 +33,16 @@ export async function PUT(req: NextRequest, { params }: Params) {
   try {
     const { id } = await params;
     const body = await req.json();
-    const { images, variants, tags, id: _id, categoryId, subCategoryId, category, subCategory, reviews, ...data } = body;
+    const { images, variants, tags, id: _id, categoryId, subCategoryId, category, subCategory, reviews, ...raw } = body;
+    const data = {
+      ...raw,
+      subCategoryId: subCategoryId || null,
+      comparePrice:  raw.comparePrice  || null,
+      costPrice:     raw.costPrice     || null,
+      weight:        raw.weight        || null,
+      sku:           raw.sku           || null,
+      status:        raw.status        || "active",
+    };
 
     await prisma.$transaction([
       prisma.productImage.deleteMany({ where: { productId: id } }),
@@ -46,7 +55,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
       data: {
         ...data,
         categoryId,
-        subCategoryId: subCategoryId || null,
+        subCategoryId: data.subCategoryId,
         images: images?.length
           ? { create: images.map((img: any, i: number) => ({ url: img.url, isPrimary: img.isPrimary || i === 0, sortOrder: i })) }
           : undefined,

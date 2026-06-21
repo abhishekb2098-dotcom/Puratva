@@ -46,6 +46,18 @@ export async function GET(req: NextRequest) {
   }
 }
 
+function sanitizeProductData(data: any) {
+  return {
+    ...data,
+    subCategoryId: data.subCategoryId || null,
+    comparePrice:  data.comparePrice  || null,
+    costPrice:     data.costPrice     || null,
+    weight:        data.weight        || null,
+    sku:           data.sku           || null,
+    status:        data.status        || "active",
+  };
+}
+
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (session?.user?.role !== "ADMIN") {
@@ -54,7 +66,8 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { images, variants, tags, ...productData } = body;
+    const { images, variants, tags, ...raw } = body;
+    const productData = sanitizeProductData(raw);
 
     const product = await prisma.product.create({
       data: {
