@@ -49,12 +49,12 @@ export async function GET(req: NextRequest) {
 // Resolve effective stock across product + all variants
 function resolveStatus(stock: number, variants: any[], requestedStatus: string): string {
   if (requestedStatus === "coming_soon") return "coming_soon";
+  if (requestedStatus === "out_of_stock") return "out_of_stock";
   const variantStock = variants?.length
     ? variants.reduce((s: number, v: any) => s + (parseInt(v.stock) || 0), 0)
     : null;
   const effectiveStock = variantStock !== null ? variantStock : stock;
   if (effectiveStock <= 0) return "out_of_stock";
-  if (requestedStatus === "out_of_stock") return "active"; // auto-restore when re-stocked
   return requestedStatus || "active";
 }
 

@@ -16,17 +16,22 @@ const PRODUCT_STATUSES = [
   { value: "coming_soon",  label: "Coming Soon",   color: "bg-yellow-100 text-yellow-700" },
 ] as const;
 
+const nanToUndefined = z.preprocess(
+  (v) => (typeof v === "number" && isNaN(v)) ? undefined : v,
+  z.number().positive().optional()
+);
+
 const schema = z.object({
   name: z.string().min(2),
   slug: z.string().min(2),
   description: z.string().min(10),
   shortDesc: z.string().optional(),
   price: z.number().positive(),
-  comparePrice: z.number().optional(),
+  comparePrice: nanToUndefined,
   sku: z.string().optional(),
-  stock: z.number().min(0),
+  stock: z.preprocess((v) => (typeof v === "number" && isNaN(v)) ? 0 : v, z.number().min(0)),
   unit: z.string().default("kg"),
-  weight: z.number().optional(),
+  weight: nanToUndefined,
   categoryId: z.string().min(1),
   subCategoryId: z.string().optional(),
   status: z.enum(["active", "out_of_stock", "coming_soon"]).default("active"),
@@ -66,6 +71,15 @@ export default function ProductForm({ product, categories, isNew }: Props) {
       price: product?.price || 0,
       stock: product?.stock || 0,
       status: product?.status || "active",
+      // Normalize DB nulls so Zod doesn't receive null for string-optional fields
+      sku:           product?.sku           ?? "",
+      unit:          product?.unit          ?? "kg",
+      subCategoryId: product?.subCategoryId ?? "",
+      shortDesc:     product?.shortDesc     ?? "",
+      metaTitle:     product?.metaTitle     ?? "",
+      metaDesc:      product?.metaDesc      ?? "",
+      comparePrice:  product?.comparePrice  ?? undefined,
+      weight:        product?.weight        ?? undefined,
     },
   });
 
@@ -121,6 +135,7 @@ export default function ProductForm({ product, categories, isNew }: Props) {
   const nameValue = watch("name");
   const statusValue = watch("status");
   const isComingSoon = statusValue === "coming_soon";
+  const isRestricted = statusValue === "coming_soon" || statusValue === "out_of_stock";
 
   const autofillSlug = () => {
     if (nameValue && isNew) setValue("slug", slugify(nameValue));
@@ -170,9 +185,9 @@ export default function ProductForm({ product, categories, isNew }: Props) {
         {/* Pricing */}
         <div className="bg-white rounded-2xl border p-6 space-y-4">
           <h2 className="font-bold text-lg">Pricing & Inventory</h2>
-          {isComingSoon && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-2.5 text-sm text-yellow-700">
-              Stock, unit, SKU and weight are hidden for <strong>Coming Soon</strong> products.
+          {isRestricted && (
+            <div className={`border rounded-xl px-4 py-2.5 text-sm ${isComingSoon ? "bg-yellow-50 border-yellow-200 text-yellow-700" : "bg-red-50 border-red-200 text-red-700"}`}>
+              Stock, unit, SKU and weight are hidden for <strong>{isComingSoon ? "Coming Soon" : "Out of Stock"}</strong> products.
             </div>
           )}
           <div className="grid grid-cols-2 gap-4">
@@ -194,7 +209,7 @@ export default function ProductForm({ product, categories, isNew }: Props) {
                 className="w-full border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-puratva-green/30"
               />
             </div>
-            {!isComingSoon && (<>
+            {!isRestricted && (<>
             <div>
               <label className="block text-sm font-medium mb-1">Stock *</label>
               <input
@@ -223,8 +238,8 @@ export default function ProductForm({ product, categories, isNew }: Props) {
           </div>
         </div>
 
-        {/* Variants — hidden for Coming Soon */}
-        {!isComingSoon && <div className="bg-white rounded-2xl border p-6">
+        {/* Variants — hidden for Coming Soon and Out of Stock */}
+        {!isRestricted && <div className="bg-white rounded-2xl border p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="font-bold text-lg">Product Variants</h2>
             <button type="button" onClick={() => setVariants([...variants, { name: "", value: "", price: "", stock: "0" }])} className="flex items-center gap-1 text-sm text-puratva-green hover:underline">
