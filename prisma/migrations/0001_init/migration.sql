@@ -111,6 +111,7 @@ CREATE TABLE IF NOT EXISTS "products" (
     "categoryId" TEXT NOT NULL,
     "subCategoryId" TEXT,
     "sortOrder" INTEGER NOT NULL DEFAULT 0,
+    "status" TEXT NOT NULL DEFAULT 'active',
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
     CONSTRAINT "products_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "categories" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -387,3 +388,14 @@ CREATE UNIQUE INDEX IF NOT EXISTS "newsletter_email_key" ON "newsletter"("email"
 
 -- CreateIndex
 CREATE UNIQUE INDEX IF NOT EXISTS "site_settings_key_key" ON "site_settings"("key");
+
+-- CreateTable
+CREATE TABLE IF NOT EXISTS "notifications" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "type" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "message" TEXT NOT NULL,
+    "data" TEXT,
+    "isRead" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
