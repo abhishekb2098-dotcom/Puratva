@@ -68,6 +68,8 @@ export type SiteConfig = {
   // Commerce
   currency: string;
   taxRate: string;
+  // Navigation links (JSON: [{id,label,href,enabled}][])
+  navLinks: string;
 };
 
 export const defaultConfig: SiteConfig = {
@@ -136,6 +138,13 @@ export const defaultConfig: SiteConfig = {
   ]),
   currency: "INR",
   taxRate: "18",
+  navLinks: JSON.stringify([
+    { id: "home",    label: "Home",    href: "/",        enabled: true },
+    { id: "shop",    label: "Shop",    href: "/shop",    enabled: true },
+    { id: "about",   label: "About",   href: "/about",   enabled: true },
+    { id: "blog",    label: "Blog",    href: "/blog",    enabled: true },
+    { id: "contact", label: "Contact", href: "/contact", enabled: true },
+  ]),
 };
 
 async function _getSiteConfig(): Promise<SiteConfig> {

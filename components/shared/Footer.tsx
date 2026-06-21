@@ -3,7 +3,21 @@ import Image from "next/image";
 import { Leaf, Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin } from "lucide-react";
 import type { SiteConfig } from "@/lib/site-config";
 
-export default function Footer({ config }: { config: SiteConfig }) {
+type Category = { name: string; slug: string; icon: string };
+
+const FALLBACK_CATEGORIES: Category[] = [
+  { name: "🫒 Oils",         slug: "oils",          icon: "" },
+  { name: "🧈 Ghee",         slug: "ghee",          icon: "" },
+  { name: "🥭 Pickles",      slug: "pickles",       icon: "" },
+  { name: "🍲 Premixes",     slug: "premixes",      icon: "" },
+  { name: "🌾 Pulses",       slug: "pulses",        icon: "" },
+  { name: "🥛 Dairy Products",slug: "dairy-products",icon: "" },
+];
+
+export default function Footer({ config, categories: propCategories }: { config: SiteConfig; categories?: Category[] }) {
+  const footerCategories = propCategories && propCategories.length > 0
+    ? propCategories
+    : FALLBACK_CATEGORIES;
   return (
     <footer className="bg-puratva-green-dark text-puratva-cream">
       <div className="container py-16">
@@ -92,17 +106,10 @@ export default function Footer({ config }: { config: SiteConfig }) {
           <div>
             <h4 className="font-display text-lg font-semibold mb-4">Categories</h4>
             <ul className="space-y-2 text-sm text-puratva-cream/80">
-              {[
-                { label: "🫒 Oils", href: "/shop/oils" },
-                { label: "🧈 Ghee", href: "/shop/ghee" },
-                { label: "🥭 Pickles", href: "/shop/pickles" },
-                { label: "🍲 Premixes", href: "/shop/premixes" },
-                { label: "🌾 Pulses", href: "/shop/pulses" },
-                { label: "🥛 Dairy Products", href: "/shop/dairy-products" },
-              ].map((cat) => (
-                <li key={cat.href}>
-                  <Link href={cat.href} className="hover:text-puratva-gold transition-colors">
-                    {cat.label}
+              {footerCategories.map((cat) => (
+                <li key={cat.slug}>
+                  <Link href={`/shop/${cat.slug}`} className="hover:text-puratva-gold transition-colors">
+                    {cat.icon ? `${cat.icon} ${cat.name}` : cat.name}
                   </Link>
                 </li>
               ))}

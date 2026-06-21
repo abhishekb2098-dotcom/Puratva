@@ -117,9 +117,9 @@ export default function CategoriesSection({ categories, spacing = "M" }: Props &
               <motion.div key={cat.id} variants={item}>
                 <Link href={`/shop/${cat.slug}`} className="group block">
                   <div
-                    className={`relative overflow-hidden rounded-2xl border ${style.border} bg-gradient-to-br ${style.bg} p-4 text-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1`}
+                    className={`relative overflow-hidden rounded-2xl border ${style.border} bg-gradient-to-br ${style.bg} p-2.5 md:p-4 text-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1`}
                   >
-                    <div className="relative w-full aspect-square rounded-xl overflow-hidden mb-3">
+                    <div className="relative w-full aspect-square rounded-xl overflow-hidden mb-2 md:mb-3">
                       <Image
                         src={image}
                         alt={cat.name}
@@ -131,11 +131,11 @@ export default function CategoriesSection({ categories, spacing = "M" }: Props &
                         {icon}
                       </span>
                     </div>
-                    <h3 className="font-display font-bold text-sm">{cat.name}</h3>
-                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                    <h3 className="font-display font-bold text-xs md:text-sm leading-tight line-clamp-1">{cat.name}</h3>
+                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1 hidden md:block">
                       {cat.description}
                     </p>
-                    <span className="inline-block mt-2 text-xs bg-puratva-green/10 text-puratva-green px-2 py-0.5 rounded-full">
+                    <span className="inline-block mt-1 md:mt-2 text-[10px] md:text-xs bg-puratva-green/10 text-puratva-green px-1.5 md:px-2 py-0.5 rounded-full">
                       {countLabel}
                     </span>
                   </div>

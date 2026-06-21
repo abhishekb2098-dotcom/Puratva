@@ -5,7 +5,7 @@ import Image from "next/image";
 import toast from "react-hot-toast";
 import {
   Store, Palette, Type, Phone, Share2, Home, Info, ShoppingBag,
-  Save, Upload, X, Check, Layers,
+  Save, Upload, X, Check, Layers, Navigation,
   Leaf, Sprout, ShieldCheck, Award, Users, Truck,
   Heart, Star, Package, Zap, Globe, Clock, CheckCircle,
   Flame, Droplets, Wheat, ThumbsUp, Sun, Wind, Gift, Coffee,
@@ -35,6 +35,7 @@ const TABS = [
   { id: "fonts",     label: "Fonts",      icon: Type },
   { id: "contact",   label: "Contact",    icon: Phone },
   { id: "social",    label: "Social",     icon: Share2 },
+  { id: "nav",       label: "Navigation", icon: Navigation },
   { id: "structure", label: "Structure",  icon: Layers },
   { id: "home",      label: "Home Page",  icon: Home },
   { id: "whyus",     label: "Why Us",     icon: Info },
@@ -43,6 +44,23 @@ const TABS = [
 ] as const;
 
 type HomeSection = { id: string; enabled: boolean; size: string };
+type NavLink = { id: string; label: string; href: string; enabled: boolean };
+
+const DEFAULT_NAV_LINKS: NavLink[] = [
+  { id: "home",    label: "Home",    href: "/",        enabled: true },
+  { id: "shop",    label: "Shop",    href: "/shop",    enabled: true },
+  { id: "about",   label: "About",   href: "/about",   enabled: true },
+  { id: "blog",    label: "Blog",    href: "/blog",    enabled: true },
+  { id: "contact", label: "Contact", href: "/contact", enabled: true },
+];
+
+function parseNavLinks(raw: string): NavLink[] {
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed;
+  } catch {}
+  return DEFAULT_NAV_LINKS;
+}
 
 const SECTION_META: Record<string, { label: string; description: string; icon: LucideIcon }> = {
   hero:        { label: "Hero Banner",      description: "Full-width image/video banner carousel",       icon: Home },
@@ -219,6 +237,14 @@ export default function SettingsPanel({ initial }: { initial: SiteConfig }) {
 
   // Section structure state — derived from cfg.homePageSections
   const [sections, setSections] = useState<HomeSection[]>(() => parseSections(initial.homePageSections));
+
+  // Nav links state
+  const [navLinks, setNavLinks] = useState<NavLink[]>(() => parseNavLinks(initial.navLinks ?? "[]"));
+
+  const updateNavLinks = useCallback((next: NavLink[]) => {
+    setNavLinks(next);
+    setCfg((c) => ({ ...c, navLinks: JSON.stringify(next) }));
+  }, []);
 
   const updateSections = useCallback((next: HomeSection[]) => {
     setSections(next);
@@ -458,6 +484,52 @@ export default function SettingsPanel({ initial }: { initial: SiteConfig }) {
                   <Input value={(cfg as any)[key]} onChange={(e) => set(key, e.target.value)} placeholder={`https://www.${key}.com/yourpage`} />
                 </Field>
               ))}
+            </>
+          )}
+
+          {tab === "nav" && (
+            <>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="font-bold text-lg">Navigation Links</h2>
+                  <p className="text-sm text-muted-foreground">Show or hide links in the top navigation bar.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => updateNavLinks(DEFAULT_NAV_LINKS)}
+                  className="text-xs text-muted-foreground border rounded-lg px-3 py-1.5 hover:bg-muted transition-colors"
+                >
+                  Reset to Default
+                </button>
+              </div>
+              <div className="space-y-2 mt-2">
+                {navLinks.map((link, i) => (
+                  <div key={link.id} className={`flex items-center gap-4 p-4 rounded-xl border transition-all ${link.enabled ? "bg-white border-border" : "bg-muted/30 border-dashed border-muted-foreground/30 opacity-60"}`}>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold">{link.label}</p>
+                      <p className="text-xs text-muted-foreground font-mono">{link.href}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => updateNavLinks(navLinks.map((l, j) => j === i ? { ...l, enabled: !l.enabled } : l))}
+                      title={link.enabled ? "Hide link" : "Show link"}
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${link.enabled ? "bg-puratva-green/10 text-puratva-green hover:bg-puratva-green/20" : "bg-muted text-muted-foreground hover:bg-muted-foreground/20"}`}
+                    >
+                      {link.enabled ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                      {link.enabled ? "Visible" : "Hidden"}
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 p-4 bg-muted/30 rounded-xl">
+                <p className="text-xs font-semibold text-muted-foreground mb-2">VISIBLE LINKS IN NAVBAR</p>
+                <div className="flex flex-wrap gap-2">
+                  {navLinks.filter((l) => l.enabled).map((l) => (
+                    <span key={l.id} className="text-xs bg-white border rounded-lg px-2.5 py-1 font-medium">{l.label}</span>
+                  ))}
+                  {navLinks.every((l) => !l.enabled) && <span className="text-xs text-muted-foreground">No links visible</span>}
+                </div>
+              </div>
             </>
           )}
 

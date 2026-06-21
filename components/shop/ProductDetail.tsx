@@ -125,22 +125,29 @@ export default function ProductDetail({ product }: Props) {
             </div>
           </div>
 
-          <div className="flex items-baseline gap-3">
-            <span className="font-display text-4xl font-bold text-puratva-green-dark">{formatPrice(price)}</span>
-            {product.comparePrice && product.comparePrice > price && (
-              <>
-                <span className="text-xl text-muted-foreground line-through">{formatPrice(product.comparePrice)}</span>
-                <span className="bg-red-100 text-red-600 text-sm font-bold px-2 py-0.5 rounded-full">-{discount}% OFF</span>
-              </>
-            )}
-          </div>
+          {(product as any).status === "coming_soon" ? (
+            <div className="flex items-center gap-3">
+              <span className="bg-yellow-100 text-yellow-800 font-bold text-lg px-4 py-2 rounded-xl">Coming Soon</span>
+              <span className="text-sm text-muted-foreground">Price will be announced soon</span>
+            </div>
+          ) : (
+            <div className="flex items-baseline gap-3">
+              <span className="font-display text-4xl font-bold text-puratva-green-dark">{formatPrice(price)}</span>
+              {product.comparePrice && product.comparePrice > price && (
+                <>
+                  <span className="text-xl text-muted-foreground line-through">{formatPrice(product.comparePrice)}</span>
+                  <span className="bg-red-100 text-red-600 text-sm font-bold px-2 py-0.5 rounded-full">-{discount}% OFF</span>
+                </>
+              )}
+            </div>
+          )}
 
           {product.shortDesc && (
             <p className="text-muted-foreground leading-relaxed">{product.shortDesc}</p>
           )}
 
-          {/* Variants */}
-          {product.variants.length > 0 && (
+          {/* Variants — hidden for coming soon */}
+          {(product as any).status !== "coming_soon" && product.variants.length > 0 && (
             <div>
               <p className="text-sm font-semibold mb-2">Choose Size / Variant</p>
               <div className="flex gap-2 flex-wrap">
@@ -162,49 +169,67 @@ export default function ProductDetail({ product }: Props) {
             </div>
           )}
 
-          {/* Quantity */}
-          <div className="flex items-center gap-4">
-            <div className="flex items-center border rounded-xl overflow-hidden">
-              <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-4 py-3 hover:bg-muted transition-colors">
-                <Minus className="w-4 h-4" />
+          {/* Quantity + CTA — hidden for coming soon */}
+          {(product as any).status !== "coming_soon" ? (
+            <>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center border rounded-xl overflow-hidden">
+                  <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-4 py-3 hover:bg-muted transition-colors">
+                    <Minus className="w-4 h-4" />
+                  </button>
+                  <span className="w-12 text-center font-semibold">{quantity}</span>
+                  <button onClick={() => setQuantity(Math.min(product.stock, quantity + 1))} className="px-4 py-3 hover:bg-muted transition-colors">
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+                <span className="text-sm text-muted-foreground">
+                  {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
+                </span>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={handleAddToCart}
+                  disabled={product.stock === 0}
+                  className="flex-1 flex items-center justify-center gap-2 border-2 border-puratva-green text-puratva-green font-semibold py-3 rounded-xl hover:bg-puratva-cream transition-colors disabled:opacity-50"
+                >
+                  <ShoppingCart className="w-5 h-5" />
+                  Add to Cart
+                </button>
+                <button
+                  onClick={handleBuyNow}
+                  disabled={product.stock === 0}
+                  className="flex-1 bg-puratva-green text-white font-semibold py-3 rounded-xl hover:bg-puratva-green-dark transition-colors disabled:opacity-50"
+                >
+                  Buy Now
+                </button>
+                <button
+                  onClick={() => {
+                    if (isWished) { removeWish(product.id); toast("Removed from wishlist"); }
+                    else { const img = product.images[0]?.url || ""; addWish({ id: `w-${product.id}`, productId: product.id, name: product.name, price, comparePrice: product.comparePrice || undefined, image: img, slug: product.slug }); toast.success("Added to wishlist!"); }
+                  }}
+                  className={`w-12 h-12 flex items-center justify-center border rounded-xl transition-colors ${isWished ? "bg-red-50 border-red-200" : "hover:bg-muted"}`}
+                >
+                  <Heart className={`w-5 h-5 ${isWished ? "fill-red-500 text-red-500" : ""}`} />
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="flex gap-3">
+              <button className="flex-1 bg-yellow-100 text-yellow-800 font-semibold py-3 rounded-xl cursor-default" disabled>
+                Notify Me When Available
               </button>
-              <span className="w-12 text-center font-semibold">{quantity}</span>
-              <button onClick={() => setQuantity(Math.min(product.stock, quantity + 1))} className="px-4 py-3 hover:bg-muted transition-colors">
-                <Plus className="w-4 h-4" />
+              <button
+                onClick={() => {
+                  if (isWished) { removeWish(product.id); toast("Removed from wishlist"); }
+                  else { const img = product.images[0]?.url || ""; addWish({ id: `w-${product.id}`, productId: product.id, name: product.name, price: 0, image: img, slug: product.slug }); toast.success("Added to wishlist!"); }
+                }}
+                className={`w-12 h-12 flex items-center justify-center border rounded-xl transition-colors ${isWished ? "bg-red-50 border-red-200" : "hover:bg-muted"}`}
+              >
+                <Heart className={`w-5 h-5 ${isWished ? "fill-red-500 text-red-500" : ""}`} />
               </button>
             </div>
-            <span className="text-sm text-muted-foreground">
-              {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
-            </span>
-          </div>
-
-          {/* CTA */}
-          <div className="flex gap-3">
-            <button
-              onClick={handleAddToCart}
-              disabled={product.stock === 0}
-              className="flex-1 flex items-center justify-center gap-2 border-2 border-puratva-green text-puratva-green font-semibold py-3 rounded-xl hover:bg-puratva-cream transition-colors disabled:opacity-50"
-            >
-              <ShoppingCart className="w-5 h-5" />
-              Add to Cart
-            </button>
-            <button
-              onClick={handleBuyNow}
-              disabled={product.stock === 0}
-              className="flex-1 bg-puratva-green text-white font-semibold py-3 rounded-xl hover:bg-puratva-green-dark transition-colors disabled:opacity-50"
-            >
-              Buy Now
-            </button>
-            <button
-              onClick={() => {
-                if (isWished) { removeWish(product.id); toast("Removed from wishlist"); }
-                else { const img = product.images[0]?.url || ""; addWish({ id: `w-${product.id}`, productId: product.id, name: product.name, price, comparePrice: product.comparePrice || undefined, image: img, slug: product.slug }); toast.success("Added to wishlist!"); }
-              }}
-              className={`w-12 h-12 flex items-center justify-center border rounded-xl transition-colors ${isWished ? "bg-red-50 border-red-200" : "hover:bg-muted"}`}
-            >
-              <Heart className={`w-5 h-5 ${isWished ? "fill-red-500 text-red-500" : ""}`} />
-            </button>
-          </div>
+          )}
 
           {/* Trust */}
           <div className="grid grid-cols-3 gap-3 pt-3 border-t">

@@ -104,34 +104,38 @@ export default function ProductGrid({ products, total, page, limit, searchParams
                     <Heart className={`w-4 h-4 ${isWished ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} />
                   </button>
                 </div>
-                <div className="p-3">
-                  <div className="text-xs text-puratva-green font-medium mb-1">{p.category?.name}</div>
+                <div className="p-2.5 md:p-3">
+                  <div className="text-xs text-puratva-green font-medium mb-0.5 truncate">{p.category?.name}</div>
                   <Link href={`/product/${p.slug}`}>
-                    <h3 className="font-medium text-sm line-clamp-2 hover:text-puratva-green transition-colors">{p.name}</h3>
+                    <h3 className="font-medium text-xs md:text-sm line-clamp-2 hover:text-puratva-green transition-colors leading-snug">{p.name}</h3>
                   </Link>
                   <div className="flex items-center gap-1 mt-1">
-                    <Star className="w-3 h-3 fill-puratva-gold text-puratva-gold" />
+                    <Star className="w-3 h-3 fill-puratva-gold text-puratva-gold shrink-0" />
                     <span className="text-xs">{avgRating.toFixed(1)}</span>
-                    <span className="text-xs text-muted-foreground">({p.reviews?.length})</span>
+                    <span className="text-xs text-muted-foreground hidden sm:inline">({p.reviews?.length})</span>
                   </div>
-                  <div className="text-xs text-muted-foreground">{p.unit}</div>
-                  <div className="flex items-center justify-between mt-2">
-                    <div>
-                      <span className="font-bold text-sm">{formatPrice(p.price)}</span>
-                      {p.comparePrice && p.comparePrice > p.price && (
-                        <span className="text-xs text-muted-foreground line-through ml-1">{formatPrice(p.comparePrice)}</span>
+                  <div className="text-xs text-muted-foreground truncate">{p.unit}</div>
+                  <div className="flex items-center justify-between mt-2 gap-1">
+                    <div className="min-w-0">
+                      {(p as any).status !== "coming_soon" && (
+                        <div className="flex items-baseline gap-1 flex-wrap">
+                          <span className="font-bold text-xs md:text-sm">{formatPrice(p.price)}</span>
+                          {p.comparePrice && p.comparePrice > p.price && (
+                            <span className="text-[10px] text-muted-foreground line-through">{formatPrice(p.comparePrice)}</span>
+                          )}
+                        </div>
                       )}
                     </div>
                     {(p as any).status === "coming_soon" ? (
-                      <span className="text-xs px-2.5 py-1.5 bg-yellow-100 text-yellow-700 font-semibold rounded-lg">Coming Soon</span>
+                      <span className="text-[10px] md:text-xs px-2 py-1 bg-yellow-100 text-yellow-700 font-semibold rounded-lg whitespace-nowrap">Soon</span>
                     ) : (
                       <button
                         onClick={() => handleAddToCart(p)}
                         disabled={(p as any).status === "out_of_stock" || p.stock === 0}
-                        className="flex items-center gap-1 bg-puratva-green text-white text-xs px-2.5 py-1.5 rounded-lg hover:bg-puratva-green-dark transition-colors disabled:opacity-50"
+                        className="flex items-center gap-1 bg-puratva-green text-white text-[10px] md:text-xs px-2 md:px-2.5 py-1.5 rounded-lg hover:bg-puratva-green-dark transition-colors disabled:opacity-50 shrink-0"
                       >
                         <ShoppingCart className="w-3 h-3" />
-                        {(p as any).status === "out_of_stock" || p.stock === 0 ? "Sold Out" : "Add"}
+                        <span className="hidden sm:inline">{(p as any).status === "out_of_stock" || p.stock === 0 ? "Sold Out" : "Add"}</span>
                       </button>
                     )}
                   </div>

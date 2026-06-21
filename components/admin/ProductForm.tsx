@@ -26,7 +26,7 @@ const schema = z.object({
   slug: z.string().min(2),
   description: z.string().min(10),
   shortDesc: z.string().optional(),
-  price: z.number().positive(),
+  price: z.preprocess((v) => (typeof v === "number" && isNaN(v)) ? 0 : (v ?? 0), z.number().min(0)),
   comparePrice: nanToUndefined,
   sku: z.string().optional(),
   stock: z.preprocess((v) => (typeof v === "number" && isNaN(v)) ? 0 : v, z.number().min(0)),
@@ -187,10 +187,13 @@ export default function ProductForm({ product, categories, isNew }: Props) {
           <h2 className="font-bold text-lg">Pricing & Inventory</h2>
           {isRestricted && (
             <div className={`border rounded-xl px-4 py-2.5 text-sm ${isComingSoon ? "bg-yellow-50 border-yellow-200 text-yellow-700" : "bg-red-50 border-red-200 text-red-700"}`}>
-              Stock, unit, SKU and weight are hidden for <strong>{isComingSoon ? "Coming Soon" : "Out of Stock"}</strong> products.
+              {isComingSoon
+                ? "Price, stock, unit, SKU and weight are hidden for Coming Soon products."
+                : "Stock, unit, SKU and weight are hidden for Out of Stock products."}
             </div>
           )}
           <div className="grid grid-cols-2 gap-4">
+            {!isComingSoon && (<>
             <div>
               <label className="block text-sm font-medium mb-1">Price (₹) *</label>
               <input
@@ -209,6 +212,7 @@ export default function ProductForm({ product, categories, isNew }: Props) {
                 className="w-full border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-puratva-green/30"
               />
             </div>
+            </>)}
             {!isRestricted && (<>
             <div>
               <label className="block text-sm font-medium mb-1">Stock *</label>

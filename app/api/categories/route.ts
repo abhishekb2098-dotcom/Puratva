@@ -25,9 +25,26 @@ export async function POST(req: NextRequest) {
   }
   try {
     const body = await req.json();
+
+    if (body.slug) {
+      const existing = await prisma.category.findUnique({ where: { slug: body.slug } });
+      if (existing) {
+        return NextResponse.json(
+          { success: false, error: `A category with slug "${body.slug}" already exists. Please use a different name or slug.` },
+          { status: 409 }
+        );
+      }
+    }
+
     const category = await prisma.category.create({ data: body });
     return NextResponse.json({ success: true, data: category });
   } catch (error: any) {
+    if (error.message?.includes("UNIQUE constraint failed")) {
+      return NextResponse.json(
+        { success: false, error: "A category with this name or slug already exists." },
+        { status: 409 }
+      );
+    }
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
